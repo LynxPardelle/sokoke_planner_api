@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsDate } from '@nestjs/class-validator';
+import { IsString } from '@nestjs/class-validator';
 import { TProjectUpdateDTO } from '../types/project.type';
 import { CreateProjectDTO } from './createProject.dto';
 export class UpdateProjectDTO
@@ -7,12 +7,6 @@ export class UpdateProjectDTO
 {
   @IsString()
   public _id: string;
-  @IsDate()
-  @IsOptional()
-  public createdAt: Date;
-  @IsDate()
-  @IsOptional()
-  public updatedAt: Date;
   constructor(project: TProjectUpdateDTO) {
     super(project);
     this._id = project._id;

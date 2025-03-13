@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   sokoke_planner_api-production:
     container_name: sokoke_planner_api-production
@@ -10,14 +8,16 @@ services:
         - PORT=${PORT:-3001}
     ports:
       - '${PORT:-3001}:${PORT:-3001}'
+    environment:
+      - NODE_OPTIONS=--max_old_space_size=4096
     deploy:
       resources:
         limits:
           cpus: '1'
-          memory: '512m'
+          memory: '4096m'
         reservations:
           cpus: '0.25'
-          memory: '256m'
+          memory: '2048m'
 
   sokoke_planner_api-dev:
     container_name: sokoke_planner_api-dev
@@ -31,6 +31,10 @@ services:
     ports:
       - '${PORT:-3001}:${PORT:-3001}'
       - '9228:9228'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - NODE_OPTIONS=--max_old_space_size=4096
     volumes:
       - .:/project
       - node_modules:/project/node_modules/
@@ -38,10 +42,10 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: '512m'
+          memory: '4096m'
         reservations:
           cpus: '0.25'
-          memory: '256m'
+          memory: '2048m'
 
 volumes:
   node_modules:

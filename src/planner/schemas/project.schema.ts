@@ -43,7 +43,7 @@ export class Project implements Omit<TProject, '_id'> {
   public subCategory: TProjectSubCategory | string;
   @Prop({ required: true })
   public startDate: Date;
-  @Prop({ default: undefined })
+  @Prop({ type: [Date || undefined], default: undefined })
   public endDate: Date | undefined;
   @Prop({
     default: [],

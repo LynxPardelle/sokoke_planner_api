@@ -1,18 +1,12 @@
-import { IsOptional, IsString, IsDate } from '@nestjs/class-validator';
+import { IsString } from '@nestjs/class-validator';
 import { TRequerimentUpdateDTO } from '../types/requeriment.type';
-import { CreateRequerimentsDTO } from './createRequeriment.dto';
+import { CreateRequerimentDTO } from './createRequeriment.dto';
 export class UpdateRequerimentDTO
-  extends CreateRequerimentsDTO
+  extends CreateRequerimentDTO
   implements TRequerimentUpdateDTO
 {
   @IsString()
   public _id: string;
-  @IsDate()
-  @IsOptional()
-  public createdAt: Date;
-  @IsDate()
-  @IsOptional()
-  public updatedAt: Date;
   constructor(requeriment: TRequerimentUpdateDTO) {
     super(requeriment);
     this._id = requeriment._id;

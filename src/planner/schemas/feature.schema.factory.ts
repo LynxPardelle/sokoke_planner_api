@@ -2,8 +2,7 @@ import { AsyncModelFactory } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 /* Schemas */
 import { FeatureDocument, featureSchema } from './feature.schema';
-import { ProjectDocument } from './project.schema';
-import { ProjectModel } from '../../../../logs-of-change/src/auth/schemas/project.schema';
+import { ProjectDocument, ProjectModel } from './project.schema';
 export const featureSchemaFactory: AsyncModelFactory = {
   name: 'Feature',
   imports: [],

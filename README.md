@@ -28,11 +28,21 @@
 
 ## Installation
 
+There is no need to install, but you can do it anyways, I'm just a sign I can't stop you.
+
 ```bash
+# install
 $ npm install
 ```
 
 ## Running the app
+
+You will need an .env, you can check the .evn-preset to check what do you want, please, don't use it on production...
+
+With Docker(Best option):
+docker-compose up sokoke_planner_api-dev
+
+Old Way:
 
 ```bash
 # development

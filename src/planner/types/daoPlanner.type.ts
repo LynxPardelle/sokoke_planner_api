@@ -13,7 +13,7 @@ import { CreateFeatureDTO } from '../DTOs/createFeature.dto';
 import { CreateProjectDTO } from '../DTOs/createProject.dto';
 import { CreateProjectCategoryDTO } from '../DTOs/createProjectCategory.dto';
 import { CreateProjectSubCategoryDTO } from '../DTOs/createProjectSubCategory.dto';
-import { CreateRequerimentsDTO } from '../DTOs/createRequeriment.dto';
+import { CreateRequerimentDTO } from '../DTOs/createRequeriment.dto';
 import { CreateStatusDTO } from '../DTOs/createStatus.dto';
 import { CreateTaskDTO } from '../DTOs/createTask.dto';
 import { UpdateFeatureDTO } from '../DTOs/updateFeature.dto';
@@ -48,7 +48,7 @@ export type TProjectSubCategoryDAO = TDAO<
   TProjectSubCategory
 >;
 export type TRequerimentDAO = TDAO<
-  CreateRequerimentsDTO,
+  CreateRequerimentDTO,
   TSearch<TRequeriment>,
   UpdateRequerimentDTO,
   TRequeriment

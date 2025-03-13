@@ -1,4 +1,4 @@
-FROM node:20-alpine3.18 AS base
+FROM node:latest AS base
 
 ENV DIR /project
 WORKDIR $DIR
@@ -9,7 +9,7 @@ ENV NODE_ENV=development
 
 COPY package*.json $DIR
 
-RUN npm i
+RUN npm ci
 
 COPY tsconfig*.json $DIR
 COPY .swcrc $DIR

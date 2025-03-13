@@ -37,13 +37,14 @@ export default class UserRepository implements TUserRepository {
         status: 'success',
         data: newUser,
       };
-    } catch (error) {
+    } catch (error: unknown) {
+      const err = error as Error;
       this._loggerService.error(
-        `error: ${error.message}`,
+        `error: ${err.message}`,
         'UserRepository.create',
       );
       return {
-        message: error.message,
+        message: err.message,
         status: 'error',
         error,
       };
@@ -63,13 +64,14 @@ export default class UserRepository implements TUserRepository {
         status: 'success',
         data: user,
       };
-    } catch (error) {
+    } catch (error: unknown) {
+      const err = error as Error;
       this._loggerService.error(
-        `error: ${error.message}`,
+        `error: ${err.message}`,
         'UserRepository.read',
       );
       return {
-        message: error.message,
+        message: err.message,
         status: 'error',
         error,
       };
@@ -92,13 +94,14 @@ export default class UserRepository implements TUserRepository {
         status: 'success',
         data: user,
       };
-    } catch (error) {
+    } catch (error: unknown) {
+      const err = error as Error;
       this._loggerService.error(
-        `error: ${error.message}`,
+        `error: ${err.message}`,
         'UserRepository.readAll',
       );
       return {
-        message: error.message,
+        message: err.message,
         status: 'error',
         error,
       };
@@ -121,13 +124,14 @@ export default class UserRepository implements TUserRepository {
         status: 'success',
         data: updatedUser,
       };
-    } catch (error) {
+    } catch (error: unknown) {
+      const err = error as Error;
       this._loggerService.error(
-        `error: ${error.message}`,
+        `error: ${err.message}`,
         'UserRepository.update',
       );
       return {
-        message: error.message,
+        message: err.message,
         status: 'error',
         error,
       };
@@ -147,15 +151,16 @@ export default class UserRepository implements TUserRepository {
         status: 'success',
         data: deletedUser,
       };
-    } catch (error) {
+    } catch (error: unknown) {
+      const err = error as Error;
       this._loggerService.error(
-        `error: ${error.message}`,
+        `error: ${err.message}`,
         'UserRepository.delete',
       );
       return {
-        message: error.message,
+        message: err.message,
         status: 'error',
-        error,
+        error: err,
       };
     }
   }
