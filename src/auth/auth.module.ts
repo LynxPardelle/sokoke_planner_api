@@ -7,9 +7,11 @@ import { AuthMiddleware } from './middlewares/auth.middleware';
 import { AuthService } from './services/auth.service';
 /* Strategies */
 import { ApiKeyStrategy } from './strategies/api-key.strategy';
+/* Guards */
 @Module({
   imports: [PassportModule, ConfigModule],
-  providers: [AuthService, ApiKeyStrategy],
+  providers: [ApiKeyStrategy, AuthService, ],
+  exports: [],
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

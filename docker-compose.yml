@@ -5,9 +5,9 @@ services:
       target: production
       context: .
       args:
-        - PORT=${PORT:-3001}
+        - PORT=${PORT:-4003}
     ports:
-      - '${PORT:-3001}:${PORT:-3001}'
+      - '${PORT:-4003}:${PORT:-4003}'
     environment:
       - NODE_OPTIONS=--max_old_space_size=4096
     deploy:
@@ -22,15 +22,24 @@ services:
   sokoke_planner_api-dev:
     container_name: sokoke_planner_api-dev
     restart: unless-stopped
-    env_file: .env
+    env_file: .env-docker
+    develop:
+      watch:
+        - action: sync
+          path: ./web
+          target: /src/web
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
     build:
       target: dev
       context: .
       args:
-        - PORT=${PORT:-3001}
+        - PORT=${PORT:-4003}
     ports:
-      - '${PORT:-3001}:${PORT:-3001}'
-      - '9228:9228'
+      - '${PORT:-4003}:${PORT:-4003}'
+      - '9229:9229'
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:

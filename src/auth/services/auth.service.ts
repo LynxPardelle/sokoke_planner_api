@@ -5,8 +5,8 @@ import { ConfigService } from '@nestjs/config';
 export class AuthService {
   private readonly apiKeys: string[];
 
-  constructor(private readonly configService: ConfigService) {
-    this.apiKeys = configService.get('apiKeys');
+  constructor(private readonly _configService: ConfigService) {
+    this.apiKeys = this._configService.get('apiKeys');
   }
 
   validateApiKey(apiKey: string): boolean {

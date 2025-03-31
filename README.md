@@ -37,12 +37,23 @@ $ npm install
 
 ## Running the app
 
-You will need an .env, you can check the .evn-preset to check what do you want, please, don't use it on production...
+To run the application, you can use Docker for both development and production environments. This is the recommended approach:
 
-With Docker(Best option):
-docker-compose up sokoke_planner_api-dev
+### With Docker (Recommended)
 
-Old Way:
+- For development:
+  ```bash
+  docker-compose up sokoke_planner_api-dev --watch
+  ```
+
+- For production:
+  ```bash
+  docker-compose up sokoke_planner_api-production
+  ```
+
+### Without Docker (Old Way)
+
+If you prefer not to use Docker, you can run the application manually:
 
 ```bash
 # development

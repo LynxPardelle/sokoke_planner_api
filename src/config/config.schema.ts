@@ -12,4 +12,5 @@ export const configSchema = Joi.object({
   MONGODB_URI: Joi.string().required(),
   JWT_SECRET: Joi.string().required(),
   API_KEYS: Joi.string().optional(),
+  FASTIFY_SECURE_SESSION_KEY: Joi.string().optional(),
 });

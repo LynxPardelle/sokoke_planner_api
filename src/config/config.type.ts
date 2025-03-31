@@ -23,6 +23,7 @@ export type TConfig = {
   mongodbUri: string;
   jwtSecret: string;
   apiKeys: string[];
+  fastifySecureSessionKey: string;
 };
 export const TConfigGuard = (value: unknown): value is TConfig =>
   typeof value === 'object' &&
@@ -35,6 +36,7 @@ export const TConfigGuard = (value: unknown): value is TConfig =>
     'mongodbUri',
     'jwtSecret',
     'apiKeys',
+    'fastifySecureSessionKey',
   ]
     .map((key) => value.hasOwnProperty(key))
     .every((hasKey) => hasKey);

@@ -20,8 +20,8 @@ import { AppService } from './core/services/app.service';
       load: [configLoader],
       validationSchema: configSchema,
     }),
-    PlannerModule,
     AuthModule,
+    PlannerModule,
     MongooseModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         uri: configService.get<string>('mongodbUri'),

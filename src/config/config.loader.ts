@@ -20,5 +20,6 @@ export const configLoader = (): TConfig => {
     mongodbUri: process.env.MONGODB_URI || '',
     jwtSecret: process.env.JWT_SECRET || '',
     apiKeys: process.env.API_KEYS ? process.env.API_KEYS.split(',') : [],
+    fastifySecureSessionKey: process.env.fastifySecureSessionKey ? process.env.fastifySecureSessionKey : ''
   };
 };
