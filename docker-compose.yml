@@ -26,8 +26,8 @@ services:
     develop:
       watch:
         - action: sync
-          path: ./web
-          target: /src/web
+          path: ./src
+          target: /src
           ignore:
             - node_modules/
         - action: rebuild
@@ -45,7 +45,7 @@ services:
     environment:
       - NODE_OPTIONS=--max_old_space_size=4096
     volumes:
-      - .:/project
+      #- .:/project
       - node_modules:/project/node_modules/
     deploy:
       resources:

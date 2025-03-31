@@ -10,6 +10,6 @@ export class AppService {
     };
   }
   getHello(): string {
-    return 'Hello World from NestJS!';
+    return 'Hello World from NestJS, this API was created by Lynx Pardelle!';
   }
 }
