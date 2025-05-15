@@ -1,6 +1,6 @@
-FROM node:latest AS base
+FROM node:slim AS base
 
-ENV DIR /project
+ENV DIR=/project
 WORKDIR $DIR
 
 FROM base AS dev
