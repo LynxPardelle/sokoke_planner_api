@@ -2,9 +2,6 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
   <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
     <p align="center">
 <a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
@@ -39,14 +36,30 @@ $ npm install
 
 To run the application, you can use Docker for both development and production environments. This is the recommended approach:
 
-### With Docker (Recommended)
+## With Makefile (Recommended)
+
+- For Development:
+
+  ```bash
+  make dev
+  ```
+
+- For production:
+
+  ``` bash
+  make prod
+  ```
+
+### With Docker Compose
 
 - For development:
+
   ```bash
   docker-compose up sokoke_planner_api-dev --watch
   ```
 
 - For production:
+
   ```bash
   docker-compose up sokoke_planner_api-production
   ```
@@ -92,3 +105,18 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
+
+## 🛠️ Useful Commands
+
+| Command           | Description                                 |
+|-------------------|---------------------------------------------|
+| `make stop`       | Stop all running containers                 |
+| `make clean`      | Stop, remove volumes, and clean node_modules |
+| `make logs`       | Follow logs from the current container      |
+| `make rebuild`    | Rebuild everything from scratch             |
+| `make install pkg=axios` | Install a package inside the dev container |
+| `make install-dev pkg=vitest` | Install a dev dependency inside the container |
+
+---
+
+Happy coding! 🧑‍💻
