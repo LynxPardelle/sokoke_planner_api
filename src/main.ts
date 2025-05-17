@@ -12,6 +12,14 @@ async function bootstrap(): Promise<void> {
     AppModule,
     new FastifyAdapter({ logger: true }),
   );
+
+  // Configuración de CORS para permitir localhost:4200
+  app.enableCors({
+    origin: ['http://localhost:4200'],
+    methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'PATCH'],
+    credentials: true,
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       validatorPackage: require('@nestjs/class-validator'),
