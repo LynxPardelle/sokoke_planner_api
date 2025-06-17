@@ -1,21 +1,14 @@
-import { IsBoolean, IsOptional, IsString, IsEmail, MinLength, MaxLength } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, MinLength, MaxLength } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { TUserCreateDTO } from '../types/user.type';
-import { IsStrongPassword, IsValidUsername } from '@src/shared/decorators/password-validation.decorator';
-export class CreateUserDTO implements TUserCreateDTO {
-  @IsOptional()
-  @IsString()
-  @MinLength(2, { message: 'Name must be at least 2 characters long' })
-  @MaxLength(50, { message: 'Name must be less than 50 characters long' })
+import { IsStrongPassword, IsValidUsername, IsValidName, IsValidEmailWithInternationalChars } from '@src/shared/decorators/password-validation.decorator';
+export class CreateUserDTO implements TUserCreateDTO {  @IsOptional()
+  @IsValidName()
   public name: string;
-
   @IsOptional()
-  @IsString()
-  @MinLength(2, { message: 'Last name must be at least 2 characters long' })
-  @MaxLength(50, { message: 'Last name must be less than 50 characters long' })
+  @IsValidName()
   public lastName: string;
-
-  @IsEmail({}, { message: 'Please provide a valid email address' })
+  @IsValidEmailWithInternationalChars()
   @Transform(({ value }) => value?.toLowerCase())
   public email: string;
   @IsOptional()

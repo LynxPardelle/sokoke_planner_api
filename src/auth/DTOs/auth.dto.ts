@@ -1,9 +1,9 @@
-import { IsEmail, IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { IsStrongPassword } from '@src/shared/decorators/password-validation.decorator';
+import { IsStrongPassword, IsValidEmailWithInternationalChars, IsValidName } from '@src/shared/decorators/password-validation.decorator';
 
 export class LoginDTO {
-  @IsEmail({}, { message: 'Please provide a valid email address' })
+  @IsValidEmailWithInternationalChars()
   @Transform(({ value }) => value?.toLowerCase())
   @IsNotEmpty({ message: 'Email is required' })
   email: string;
@@ -14,7 +14,7 @@ export class LoginDTO {
 }
 
 export class RegisterDTO {
-  @IsEmail({}, { message: 'Please provide a valid email address' })
+  @IsValidEmailWithInternationalChars()
   @Transform(({ value }) => value?.toLowerCase())
   @IsNotEmpty({ message: 'Email is required' })
   email: string;
@@ -24,17 +24,17 @@ export class RegisterDTO {
   @IsNotEmpty({ message: 'Password is required' })
   password: string;
 
-  @IsString()
+  @IsValidName()
   @IsNotEmpty({ message: 'Name is required' })
   name: string;
 
-  @IsString()
+  @IsValidName()
   @IsNotEmpty({ message: 'Last name is required' })
   lastName: string;
 }
 
 export class ForgotPasswordDTO {
-  @IsEmail({}, { message: 'Please provide a valid email address' })
+  @IsValidEmailWithInternationalChars()
   @Transform(({ value }) => value?.toLowerCase())
   @IsNotEmpty({ message: 'Email is required' })
   email: string;
