@@ -7,7 +7,6 @@ export class CreateUserDTO implements TUserCreateDTO {
   @IsOptional()
   @IsString()
   public lastName: string;
-  @IsOptional()
   @IsString()
   public email: string;
   @IsOptional()
