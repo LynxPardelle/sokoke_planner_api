@@ -18,20 +18,27 @@ async function bootstrap(): Promise<void> {
     origin: ['http://localhost:4200'],
     methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'PATCH'],
     credentials: true,
-  });
-
-  app.useGlobalPipes(
+  });  app.useGlobalPipes(
     new ValidationPipe({
-      validatorPackage: require('@nestjs/class-validator'),
-      transformerPackage: require('@nestjs/class-transformer'),
+      validatorPackage: require('class-validator'),
+      transformerPackage: require('class-transformer'),
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
     }),
   );
+
+  // Log all registered routes
+  const server = app.getHttpAdapter().getInstance();
+  console.log('=== Registered Routes ===');
+  server.addHook('onRoute', (routeOptions) => {
+    console.log(`${routeOptions.method}\t${routeOptions.url}`);
+  });
+
   const configService = app.get(ConfigService);
   const port = configService.get<string>('port');
   await app.listen(port, '0.0.0.0');
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
 

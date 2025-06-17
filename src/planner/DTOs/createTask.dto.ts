@@ -5,7 +5,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-} from '@nestjs/class-validator';
+} from 'class-validator';
 import { isTTask, TTask, TTaskCreateDTO } from '../types/task.type';
 import { colorDTO } from '@src/shared/DTOs/color.dto';
 import { isTProject, TProject } from '../types/project.type';

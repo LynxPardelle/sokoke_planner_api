@@ -1,4 +1,4 @@
-import { IsArray, IsDate, IsOptional, IsString } from '@nestjs/class-validator';
+import { IsArray, IsDate, IsOptional, IsString } from 'class-validator';
 import { TStatusCreateDTO } from '../types/status.type';
 import { colorDTO } from '@src/shared/DTOs/color.dto';
 import { isTUser } from '@src/user/types/user.type';

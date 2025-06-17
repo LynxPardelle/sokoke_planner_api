@@ -8,6 +8,7 @@ import { configSchema } from './config/config.schema';
 import { SharedModule } from './shared/shared.module';
 import { PlannerModule } from './planner/planner.module';
 import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 /* Controllers */
 import { AppController } from './core/controllers/app.controller';
 /* Services */
@@ -22,6 +23,7 @@ import { AppService } from './core/services/app.service';
     }),
     AuthModule,
     PlannerModule,
+    UserModule,
     MongooseModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         uri: configService.get<string>('mongodbUri'),

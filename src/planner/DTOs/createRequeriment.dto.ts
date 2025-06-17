@@ -4,7 +4,7 @@ import {
   IsDate,
   IsOptional,
   IsString,
-} from '@nestjs/class-validator';
+} from 'class-validator';
 import { isTStatus } from '../types/status.type';
 import { TRequerimentCreateDTO } from '../types/requeriment.type';
 import { isTTask } from '../types/task.type';

@@ -1,4 +1,4 @@
-import {  IsString } from '@nestjs/class-validator';
+import {  IsString } from 'class-validator';
 import { TTaskUpdateDTO } from '../types/task.type';
 import { CreateTaskDTO } from './createTask.dto';
 export class UpdateTaskDTO extends CreateTaskDTO implements TTaskUpdateDTO {

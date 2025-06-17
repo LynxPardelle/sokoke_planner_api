@@ -1,4 +1,4 @@
-import { Validate } from '@nestjs/class-validator';
+import { Validate } from 'class-validator';
 import {
   Controller,
   Get,

@@ -1,4 +1,4 @@
-import { IsDate, IsOptional, IsString } from '@nestjs/class-validator';
+import { IsDate, IsOptional, IsString } from 'class-validator';
 import { TProjectSubCategoryCreateDTO } from '../types/projectSubCategory.type';
 import { colorDTO } from '@src/shared/DTOs/color.dto';
 export class CreateProjectSubCategoryDTO

@@ -18,7 +18,7 @@ export class User implements Omit<TUser, '_id'> {
   public createdAt: Date;
   @Prop({ default: Date.now })
   public updatedAt: Date;
-  @Prop({ required: true, default: '' })
+  @Prop({ default: '' })
   public verifyToken: string;
   @Prop({ required: true, default: false })
   public verified: boolean;

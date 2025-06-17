@@ -1,4 +1,4 @@
-import { IsString } from '@nestjs/class-validator';
+import { IsString } from 'class-validator';
 import { TFeatureUpdateDTO } from '../types/feature.type';
 import { CreateFeatureDTO } from './createFeature.dto';
 export class UpdateFeatureDTO

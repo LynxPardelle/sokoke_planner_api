@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from '@nestjs/class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { TColor } from '../types/color.type';
 export class colorDTO implements TColor {
   @IsOptional()

@@ -1,4 +1,4 @@
-import { IsString } from '@nestjs/class-validator';
+import { IsString } from 'class-validator';
 import { TRequerimentUpdateDTO } from '../types/requeriment.type';
 import { CreateRequerimentDTO } from './createRequeriment.dto';
 export class UpdateRequerimentDTO

@@ -1,4 +1,4 @@
-import { IsString } from '@nestjs/class-validator';
+import { IsString } from 'class-validator';
 import { TProjectCategoryUpdateDTO } from '../types/projectCategory.type';
 import { CreateProjectCategoryDTO } from './createProjectCategory.dto';
 export class UpdateProjectCategoryDTO

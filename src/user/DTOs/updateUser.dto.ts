@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsDate } from '@nestjs/class-validator';
+import { IsOptional, IsString, IsDate } from 'class-validator';
 import { TUserUpdateDTO } from '../types/user.type';
 import { CreateUserDTO } from './createUser.dto';
 export class UpdateUserDTO extends CreateUserDTO implements TUserUpdateDTO {

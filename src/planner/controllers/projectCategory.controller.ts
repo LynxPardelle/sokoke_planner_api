@@ -1,4 +1,3 @@
-import { Validate } from '@nestjs/class-validator';
 import {
   Controller,
   Get,
@@ -28,9 +27,7 @@ export class ProjectCategoryController {
   author(): { [key: string]: string } {
     this._loggerService.info('ProjectCategoryController.author');
     return this._projectCategoryService.author();
-  }
-  @Post('')
-  @Validate(CreateProjectCategoryDTO)
+  }  @Post('')
   async create(@Body() data: CreateProjectCategoryDTO) {
     this._loggerService.info(
       'ProjectCategoryController.create',
@@ -47,9 +44,7 @@ export class ProjectCategoryController {
   async readAll() {
     const args: TSearch<TProjectCategory> = undefined;
     return await this._projectCategoryService.readAll(args);
-  }
-  @Put('')
-  @Validate(UpdateProjectCategoryDTO)
+  }  @Put('')
   async update(@Body() data: UpdateProjectCategoryDTO) {
     return await this._projectCategoryService.update(data);
   }

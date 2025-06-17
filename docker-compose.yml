@@ -45,8 +45,10 @@ services:
       - "host.docker.internal:host-gateway"
     environment:
       - NODE_OPTIONS=--max_old_space_size=4096
+      - CHOKIDAR_USEPOLLING=true
+      - MONGODB_URI=mongodb://host.docker.internal:27017/sokokePlanner
     volumes:
-      #- .:/project
+      - .:/project
       - node_modules:/project/node_modules/
     deploy:
       resources:

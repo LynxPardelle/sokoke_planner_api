@@ -1,4 +1,4 @@
-import { IsBoolean, IsOptional, IsString } from '@nestjs/class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import { TUserCreateDTO } from '../types/user.type';
 export class CreateUserDTO implements TUserCreateDTO {
   @IsOptional()
