@@ -125,7 +125,168 @@ POST /auth/refresh
 }
 ```
 
-## 📋 Project Management
+## � Enhanced Search Feature
+
+### Search Query Parameters
+
+All entity endpoints support advanced search functionality through query parameters. The search feature provides filtering, pagination, sorting, text search, and more.
+
+#### Base Search Structure
+
+```http
+GET /endpoint?search=<encoded-search-object>
+```
+
+#### Search Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `filters` | `object` | Filter by entity properties |
+| `pagination` | `object` | Page number and limit |
+| `sort` | `array` | Sorting configuration |
+| `search` | `object` | Text search configuration |
+| `advanced` | `object` | Advanced filtering options |
+
+#### Pagination Object
+
+```json
+{
+  "page": 1,
+  "limit": 20
+}
+```
+
+#### Sort Object
+
+```json
+[
+  {
+    "field": "priority",
+    "order": "desc"
+  },
+  {
+    "field": "updatedAt", 
+    "order": "desc"
+  }
+]
+```
+
+#### Text Search Object
+
+```json
+{
+  "query": "mobile app development",
+  "fields": ["name", "description"],
+  "options": {
+    "caseSensitive": false,
+    "useRegex": false
+  }
+}
+```
+
+#### Advanced Filtering Object
+
+```json
+{
+  "dateRange": [
+    {
+      "field": "startDate",
+      "start": "2024-01-01T00:00:00.000Z",
+      "end": "2024-12-31T23:59:59.999Z"
+    }
+  ],
+  "numericRange": [
+    {
+      "field": "priority",
+      "min": 5,
+      "max": 10
+    }
+  ],
+  "select": ["name", "description", "priority"],
+  "populate": ["status", "category"]
+}
+```
+
+### Search Response Format
+
+All search endpoints return results in a standardized format:
+
+```json
+{
+  "items": [
+    // Array of found entities
+  ],
+  "metadata": {
+    "total": 150,
+    "page": 1,
+    "limit": 20,
+    "totalPages": 8,
+    "hasMore": true,
+    "searchTime": 45
+  }
+}
+```
+
+### Search Examples
+
+#### Basic Filtering
+```http
+GET /projects?search={"filters":{"completed":false,"priority":5}}
+```
+
+#### Text Search with Pagination
+```http
+GET /projects?search={"search":{"query":"mobile app","fields":["name","description"]},"pagination":{"page":1,"limit":10}}
+```
+
+#### Date Range Filtering
+```http
+GET /projects?search={"advanced":{"dateRange":[{"field":"startDate","start":"2024-01-01T00:00:00.000Z","end":"2024-12-31T23:59:59.999Z"}]}}
+```
+
+#### Complex Combined Search
+```http
+GET /projects?search={"filters":{"completed":false},"search":{"query":"API development"},"advanced":{"numericRange":[{"field":"priority","min":5}]},"sort":[{"field":"priority","order":"desc"}],"pagination":{"page":1,"limit":25}}
+```
+
+### Entity-Specific Search Examples
+
+#### Projects
+```http
+# Search high-priority incomplete projects
+GET /projects?search={"filters":{"completed":false},"advanced":{"numericRange":[{"field":"priority","min":7}]},"sort":[{"field":"priority","order":"desc"}]}
+
+# Text search in project names and descriptions
+GET /projects?search={"search":{"query":"e-commerce","fields":["name","description","impactDescription"]}}
+```
+
+#### Tasks
+```http
+# Search tasks by assigned user
+GET /tasks?search={"filters":{"assignedUsers":"64a7b8c9d2e3f4a5b6c7d8e9"}}
+
+# Search tasks with text and date range
+GET /tasks?search={"search":{"query":"bug fix"},"advanced":{"dateRange":[{"field":"startDate","start":"2024-01-01T00:00:00.000Z"}]}}
+```
+
+#### Users
+```http
+# Search users by name or email
+GET /users?search={"search":{"query":"john","fields":["name","lastName","email"]}}
+
+# Get recently updated users
+GET /users?search={"sort":[{"field":"updatedAt","order":"desc"}],"pagination":{"page":1,"limit":10}}
+```
+
+### Performance Tips
+
+1. **Use Pagination**: Always include pagination to limit result sets
+2. **Field Selection**: Use `select` to return only needed fields
+3. **Proper Indexing**: Ensure database indexes for frequently searched fields
+4. **Text Search**: Prefer exact filters over text search when possible
+5. **Combine Filters**: Use filters before text search for better performance
+
+## �📋 Project Management
 
 ### Projects
 

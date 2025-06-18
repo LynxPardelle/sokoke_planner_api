@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 /* Types */
 import { TStatusDAO } from '@src/planner/types/daoPlanner.type';
 import { TStatus, asTStatus } from '@src/planner/types/status.type';
-import { TSearch } from '@src/shared/types/search.type';
+import { TSearch, TSearchResult } from '@src/shared/types/search.type';
 /* DTOs */
 import { CreateStatusDTO } from '@src/planner/DTOs/createStatus.dto';
 import { UpdateStatusDTO } from '@src/planner/DTOs/updateStatus.dto';
@@ -12,6 +12,8 @@ import {
   StatusModel,
   StatusDocument,
 } from '@src/planner/schemas/status.schema';
+/* Services */
+import { SearchService } from '@src/shared/services/search.service';
 @Injectable()
 export class MongoDBStatusDAO implements TStatusDAO {
   constructor(@InjectModel('Status') private _statusModel: StatusModel) {}
@@ -27,12 +29,12 @@ export class MongoDBStatusDAO implements TStatusDAO {
     const status: StatusDocument | null = await this._statusModel.findById(id);
     if (!status) throw new Error('Status not found');
     return asTStatus(status);
-  }
-  async readAll(args?: TSearch<TStatus>): Promise<TStatus[]> {
-    const statuses: StatusDocument[] = await this._statusModel.find();
-    if (!statuses) throw new Error('Statuses not found');
-    if (!statuses.length) throw new Error("Statuses doesn't contain anything");
-    return statuses.map(asTStatus);
+  }  async readAll(args?: TSearch<TStatus>): Promise<TSearchResult<TStatus>> {
+    return await SearchService.executeSearch(
+      this._statusModel,
+      args,
+      asTStatus
+    );
   }
   async update(status: UpdateStatusDTO): Promise<TStatus> {
     const statusUpdated: StatusDocument | null =

@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 /* Types */
 import { TProjectDAO } from '@src/planner/types/daoPlanner.type';
 import { TProject, asTProject } from '@src/planner/types/project.type';
-import { TSearch } from '@src/shared/types/search.type';
+import { TSearch, TSearchResult } from '@src/shared/types/search.type';
 /* DTOs */
 import { CreateProjectDTO } from '@src/planner/DTOs/createProject.dto';
 import { UpdateProjectDTO } from '@src/planner/DTOs/updateProject.dto';
@@ -12,6 +12,8 @@ import {
   ProjectModel,
   ProjectDocument,
 } from '@src/planner/schemas/project.schema';
+/* Services */
+import { SearchService } from '@src/shared/services/search.service';
 @Injectable()
 export class MongoDBProjectDAO implements TProjectDAO {
   constructor(@InjectModel('Project') private _projectModel: ProjectModel) {}
@@ -28,12 +30,17 @@ export class MongoDBProjectDAO implements TProjectDAO {
       await this._projectModel.findById(id);
     if (!project) throw new Error('Project not found');
     return asTProject(project);
-  }
-  async readAll(args?: TSearch<TProject>): Promise<TProject[]> {
-    const projects: ProjectDocument[] = await this._projectModel.find();
-    if (!projects) throw new Error('Projects not found');
-    if (!projects.length) throw new Error("Projects doesn't contain anything");
-    return projects.map(asTProject);
+  }  /**
+   * Read all projects with advanced search functionality
+   * @param args - Search parameters including filters, pagination, sorting, and text search
+   * @returns Promise resolving to search results with metadata
+   */
+  async readAll(args?: TSearch<TProject>): Promise<TSearchResult<TProject>> {
+    return await SearchService.executeSearch(
+      this._projectModel,
+      args,
+      asTProject
+    );
   }
   async update(project: UpdateProjectDTO): Promise<TProject> {
     const projectUpdated: ProjectDocument | null =

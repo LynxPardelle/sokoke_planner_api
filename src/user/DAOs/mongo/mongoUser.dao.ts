@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 /* Types */
 import { TUserDAO } from '@src/user/types/daoUser.type';
 import { asTUser, TUser } from '@src/user/types/user.type';
-import { TSearch } from '@src/shared/types/search.type';
+import { TSearch, TSearchResult } from '@src/shared/types/search.type';
 /* DTOs */
 import { CreateUserDTO } from '@src/user/DTOs/createUser.dto';
 import { UpdateUserDTO } from '@src/user/DTOs/updateUser.dto';
@@ -11,6 +11,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { UserDocument, UserModel } from '@src/user/schemas/user.schema';
 /* Services */
 import { LoggerService } from '@src/shared/services/logger.service';
+import { SearchService } from '@src/shared/services/search.service';
 @Injectable()
 export class MongoDBUserDAO implements TUserDAO {
   constructor(
@@ -39,20 +40,17 @@ export class MongoDBUserDAO implements TUserDAO {
       throw new Error('User not found');
     }
     return asTUser(user);
-  }
-  async readAll(args?: TSearch<TUser>): Promise<TUser[]> {
-    const user: UserDocument[] = await this._userModel.find(
-      args?.filters ? { ...args.filters } : {},
-      null,
-      args?.pagination ? { skip: (args.pagination.page - 1) * args.pagination.limit, limit: args.pagination.limit } : {}
+  }  /**
+   * Read all users with advanced search functionality
+   * @param args - Search parameters including filters, pagination, sorting, and text search
+   * @returns Promise resolving to search results with metadata
+   */
+  async readAll(args?: TSearch<TUser>): Promise<TSearchResult<TUser>> {
+    return await SearchService.executeSearch(
+      this._userModel,
+      args,
+      asTUser
     );
-    if (!user) {
-      throw new Error('User not found');
-    }
-    if (!user.length) {
-      throw new Error("User doesn't contain anything");
-    }
-    return user.map(asTUser);
   }
   async update(user: UpdateUserDTO): Promise<TUser> {
     const updatedUser: UserDocument | null =

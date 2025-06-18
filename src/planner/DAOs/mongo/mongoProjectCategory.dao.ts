@@ -6,7 +6,7 @@ import {
   TProjectCategory,
   asTProjectCategory,
 } from '@src/planner/types/projectCategory.type';
-import { TSearch } from '@src/shared/types/search.type';
+import { TSearch, TSearchResult } from '@src/shared/types/search.type';
 /* DTOs */
 import { CreateProjectCategoryDTO } from '@src/planner/DTOs/createProjectCategory.dto';
 import { UpdateProjectCategoryDTO } from '@src/planner/DTOs/updateProjectCategory.dto';
@@ -15,6 +15,8 @@ import {
   ProjectCategoryModel,
   ProjectCategoryDocument,
 } from '@src/planner/schemas/projectCategory.schema';
+/* Services */
+import { SearchService } from '@src/shared/services/search.service';
 @Injectable()
 export class MongoDBProjectCategoryDAO implements TProjectCategoryDAO {
   constructor(
@@ -35,14 +37,12 @@ export class MongoDBProjectCategoryDAO implements TProjectCategoryDAO {
       await this._projectCategoryModel.findById(id);
     if (!projectCategory) throw new Error('Project category not found');
     return asTProjectCategory(projectCategory);
-  }
-  async readAll(args?: TSearch<TProjectCategory>): Promise<TProjectCategory[]> {
-    const projectCategories: ProjectCategoryDocument[] =
-      await this._projectCategoryModel.find();
-    if (!projectCategories) throw new Error('Project categories not found');
-    if (!projectCategories.length)
-      throw new Error("Project categories doesn't contain anything");
-    return projectCategories.map(asTProjectCategory);
+  }  async readAll(args?: TSearch<TProjectCategory>): Promise<TSearchResult<TProjectCategory>> {
+    return await SearchService.executeSearch(
+      this._projectCategoryModel,
+      args,
+      asTProjectCategory
+    );
   }
   async update(
     projectCategory: UpdateProjectCategoryDTO,

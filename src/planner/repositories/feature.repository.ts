@@ -52,11 +52,16 @@ export default class FeatureRepository implements TFeatureRepository {
     args?: TSearch<TFeature>,
   ): Promise<TRepositoryResponse<TFeature[]>> {
     try {
-      const features: TFeature[] = await this._featureDAO.readAll(args);
+      const result = await this._featureDAO.readAll(args);
+      const features: TFeature[] = result.items;
+      if (!features || features.length === 0) {
+        throw new Error('No features found');
+      }
       return {
         message: 'Features found',
         status: 'success',
-        data: features as TFeature[],
+        data: features,
+        metadata: result.metadata,
       };
     } catch (error) {
       return {

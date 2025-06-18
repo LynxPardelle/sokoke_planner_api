@@ -3,7 +3,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { TRepositoryResponse } from '@src/shared/types/repositoryResponse.type';
 import { TUserRepository } from '../types/repositoryUser.type';
 import { TUser } from '../types/user.type';
-import { TSearch } from '@src/shared/types/search.type';
+import { TSearch, TSearchResult } from '@src/shared/types/search.type';
 /* DAOs */
 import { TUserDAO } from '../types/daoUser.type';
 /* DTOs */
@@ -84,15 +84,20 @@ export default class UserRepository implements TUserRepository {
         `args: ${JSON.stringify(args)}`,
         'UserRepository.readAll',
       );
-      let users: TUser[] = await this._userDAO.readAll(args);
+      const result: TSearchResult<TUser> = await this._userDAO.readAll(args);
       this._loggerService.info(
-        `users: ${JSON.stringify(users)}`,
+        `users: ${JSON.stringify(result.items)}`,
         'UserRepository.readAll',
       );
+      const users: TUser[] = result.items;
+      if (!users || users.length === 0) {
+        throw new Error('No users found');
+      }
       return {
         message: 'Users found',
         status: 'success',
         data: users,
+        metadata: result.metadata,
       };
     } catch (error: unknown) {
       const err = error as Error;

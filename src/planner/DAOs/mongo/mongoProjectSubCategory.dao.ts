@@ -6,7 +6,7 @@ import {
   TProjectSubCategory,
   asTProjectSubCategory,
 } from '@src/planner/types/projectSubCategory.type';
-import { TSearch } from '@src/shared/types/search.type';
+import { TSearch, TSearchResult } from '@src/shared/types/search.type';
 /* DTOs */
 import { CreateProjectSubCategoryDTO } from '@src/planner/DTOs/createProjectSubCategory.dto';
 import { UpdateProjectSubCategoryDTO } from '@src/planner/DTOs/updateProjectSubCategory.dto';
@@ -15,6 +15,8 @@ import {
   ProjectSubCategoryModel,
   ProjectSubCategoryDocument,
 } from '@src/planner/schemas/projectSubCategory.schema';
+/* Services */
+import { SearchService } from '@src/shared/services/search.service';
 @Injectable()
 export class MongoDBProjectSubCategoryDAO implements TProjectSubCategoryDAO {
   constructor(
@@ -40,14 +42,12 @@ export class MongoDBProjectSubCategoryDAO implements TProjectSubCategoryDAO {
   }
   async readAll(
     args?: TSearch<TProjectSubCategory>,
-  ): Promise<TProjectSubCategory[]> {
-    const projectSubCategories: ProjectSubCategoryDocument[] =
-      await this._projectSubCategoryModel.find();
-    if (!projectSubCategories)
-      throw new Error('Project sub categories not found');
-    if (!projectSubCategories.length)
-      throw new Error("Project sub categories doesn't contain anything");
-    return projectSubCategories.map(asTProjectSubCategory);
+  ): Promise<TSearchResult<TProjectSubCategory>> {
+    return await SearchService.executeSearch(
+      this._projectSubCategoryModel,
+      args,
+      asTProjectSubCategory
+    );
   }
   async update(
     projectSubCategory: UpdateProjectSubCategoryDTO,

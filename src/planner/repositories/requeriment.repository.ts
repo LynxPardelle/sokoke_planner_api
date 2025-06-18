@@ -55,12 +55,16 @@ export default class RequerimentRepository implements TRequerimentRepository {
     args?: TSearch<TRequeriment>,
   ): Promise<TRepositoryResponse<TRequeriment[]>> {
     try {
-      const requeriments: TRequeriment[] =
-        await this._requerimentDAO.readAll(args);
+      const result = await this._requerimentDAO.readAll(args);
+      const requeriments: TRequeriment[] = result.items;
+      if (!requeriments || requeriments.length === 0) {
+        throw new Error('No requeriments found');
+      }
       return {
         message: 'Requeriments found',
         status: 'success',
-        data: requeriments as TRequeriment[],
+        data: requeriments,
+        metadata: result.metadata,
       };
     } catch (error) {
       return {

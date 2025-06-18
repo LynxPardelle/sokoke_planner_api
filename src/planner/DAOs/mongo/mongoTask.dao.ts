@@ -3,12 +3,14 @@ import { InjectModel } from '@nestjs/mongoose';
 /* Types */
 import { TTaskDAO } from '@src/planner/types/daoPlanner.type';
 import { TTask, asTTask } from '@src/planner/types/task.type';
-import { TSearch } from '@src/shared/types/search.type';
+import { TSearch, TSearchResult } from '@src/shared/types/search.type';
 /* DTOs */
 import { CreateTaskDTO } from '@src/planner/DTOs/createTask.dto';
 import { UpdateTaskDTO } from '@src/planner/DTOs/updateTask.dto';
 /* Schemas */
 import { TaskModel, TaskDocument } from '@src/planner/schemas/task.schema';
+/* Services */
+import { SearchService } from '@src/shared/services/search.service';
 @Injectable()
 export class MongoDBTaskDAO implements TTaskDAO {
   constructor(@InjectModel('Task') private _taskModel: TaskModel) {}
@@ -24,12 +26,17 @@ export class MongoDBTaskDAO implements TTaskDAO {
     const task: TaskDocument | null = await this._taskModel.findById(id);
     if (!task) throw new Error('Task not found');
     return asTTask(task);
-  }
-  async readAll(args?: TSearch<TTask>): Promise<TTask[]> {
-    const tasks: TaskDocument[] = await this._taskModel.find();
-    if (!tasks) throw new Error('Tasks not found');
-    if (!tasks.length) throw new Error("Tasks doesn't contain anything");
-    return tasks.map(asTTask);
+  }  /**
+   * Read all tasks with advanced search functionality
+   * @param args - Search parameters including filters, pagination, sorting, and text search
+   * @returns Promise resolving to search results with metadata
+   */
+  async readAll(args?: TSearch<TTask>): Promise<TSearchResult<TTask>> {
+    return await SearchService.executeSearch(
+      this._taskModel,
+      args,
+      asTTask
+    );
   }
   async update(task: UpdateTaskDTO): Promise<TTask> {
     const taskUpdated: TaskDocument | null =

@@ -52,11 +52,16 @@ export default class StatusRepository implements TStatusRepository {
     args?: TSearch<TStatus>,
   ): Promise<TRepositoryResponse<TStatus[]>> {
     try {
-      const status: TStatus[] = await this._statusDAO.readAll(args);
+      const result = await this._statusDAO.readAll(args);
+      const statuses: TStatus[] = result.items;
+      if (!statuses || statuses.length === 0) {
+        throw new Error('No statuses found');
+      }
       return {
         message: 'Status found',
         status: 'success',
-        data: status as TStatus[],
+        data: statuses,
+        metadata: result.metadata,
       };
     } catch (error) {
       return {

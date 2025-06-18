@@ -494,10 +494,123 @@ export class MongoDBProjectDAO {
       return messages.join(', ');
     }
     
-    return error.message || 'Database operation failed';
-  }
+    return error.message || 'Database operation failed';  }
 }
 ```
+
+### Enhanced Search Implementation
+
+The API features a comprehensive search system that provides powerful querying capabilities across all entities. The search implementation is built around the `TSearch<T>` interface and `SearchService` utility.
+
+#### Search Architecture
+
+```typescript
+/**
+ * Search interface supporting filtering, pagination, sorting, and text search
+ */
+type TSearch<T> = {
+    filters?: Partial<T>;           // Entity property filters
+    pagination?: {                 // Page configuration
+        page: number;
+        limit: number;
+    };
+    sort?: {                       // Multi-field sorting
+        field: keyof T;
+        order: 'asc' | 'desc';
+    }[];
+    search?: {                     // Text search configuration
+        query: string;
+        fields?: (keyof T)[];
+        options?: {
+            caseSensitive?: boolean;
+            useRegex?: boolean;
+            fuzzyTolerance?: number;
+        };
+    };
+    advanced?: {                   // Advanced filtering
+        dateRange?: Array<{
+            field: keyof T;
+            start?: Date;
+            end?: Date;
+        }>;
+        numericRange?: Array<{
+            field: keyof T;
+            min?: number;
+            max?: number;
+        }>;
+        select?: (keyof T)[];      // Field selection
+        populate?: (keyof T)[];    // Reference population
+    };
+};
+```
+
+#### SearchService Implementation
+
+```typescript
+import { SearchService } from '@src/shared/services/search.service';
+
+/**
+ * Enhanced DAO readAll method using SearchService
+ */
+async readAll(args?: TSearch<TProject>): Promise<TSearchResult<TProject>> {
+    return await SearchService.executeSearch(
+        this._projectModel,
+        args,
+        asTProject  // Transformer function
+    );
+}
+
+#### Search Response Format
+
+All search operations return a standardized response:
+
+```typescript
+type TSearchResult<T> = {
+    items: T[];                    // Found entities
+    metadata: {
+        total: number;             // Total count (before pagination)
+        page: number;              // Current page
+        limit: number;             // Items per page
+        totalPages: number;        // Total available pages
+        hasMore: boolean;          // More pages available
+        searchTime?: number;       // Execution time in ms
+    };
+};
+```
+
+#### Implementation Best Practices
+
+1. **Performance Optimization**
+   ```typescript
+   // Create compound indexes for common search patterns
+   db.projects.createIndex({ "name": "text", "description": "text" });
+   db.projects.createIndex({ "priority": -1, "updatedAt": -1 });
+   db.projects.createIndex({ "completed": 1, "category": 1 });
+   ```
+
+2. **Type Safety**
+   ```typescript
+   // Search parameters are fully typed
+   const searchParams: TSearch<TProject> = {
+       filters: {
+           completed: false,    // Type-checked against TProject
+           priority: 5          // Autocomplete available
+       }
+   };
+   ```
+
+3. **Error Handling**
+   ```typescript
+   try {
+       const result = await projectDAO.readAll(searchParams);
+       console.log(`Found ${result.metadata.total} projects`);
+   } catch (error) {
+       logger.error('Search failed:', error.message);
+       // Handle search-specific errors
+   }
+   ```
+
+For comprehensive search documentation, see `/docs/SEARCH_FEATURE.md`.
 
 ## 🧪 Testing Strategies
 

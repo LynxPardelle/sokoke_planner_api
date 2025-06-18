@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 /* Types */
 import { TFeatureDAO } from '@src/planner/types/daoPlanner.type';
 import { TFeature, asTFeature } from '@src/planner/types/feature.type';
-import { TSearch } from '@src/shared/types/search.type';
+import { TSearch, TSearchResult } from '@src/shared/types/search.type';
 /* DTOs */
 import { CreateFeatureDTO } from '@src/planner/DTOs/createFeature.dto';
 import { UpdateFeatureDTO } from '@src/planner/DTOs/updateFeature.dto';
@@ -12,6 +12,8 @@ import {
   FeatureModel,
   FeatureDocument,
 } from '@src/planner/schemas/feature.schema';
+/* Services */
+import { SearchService } from '@src/shared/services/search.service';
 @Injectable()
 export class MongoDBFeatureDAO implements TFeatureDAO {
   constructor(@InjectModel('Feature') private _featureModel: FeatureModel) {}
@@ -28,12 +30,12 @@ export class MongoDBFeatureDAO implements TFeatureDAO {
       await this._featureModel.findById(id);
     if (!feature) throw new Error('Feature not found');
     return asTFeature(feature);
-  }
-  async readAll(args?: TSearch<TFeature>): Promise<TFeature[]> {
-    const features: FeatureDocument[] = await this._featureModel.find();
-    if (!features) throw new Error('Features not found');
-    if (!features.length) throw new Error("Features doesn't contain anything");
-    return features.map(asTFeature);
+  }  async readAll(args?: TSearch<TFeature>): Promise<TSearchResult<TFeature>> {
+    return await SearchService.executeSearch(
+      this._featureModel,
+      args,
+      asTFeature
+    );
   }
   async update(feature: UpdateFeatureDTO): Promise<TFeature> {
     const featureUpdated: FeatureDocument | null =

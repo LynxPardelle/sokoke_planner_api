@@ -50,11 +50,16 @@ export default class TaskRepository implements TTaskRepository {
   }
   async readAll(args?: TSearch<TTask>): Promise<TRepositoryResponse<TTask[]>> {
     try {
-      const tasks: TTask[] = await this._taskDAO.readAll(args);
+      const result = await this._taskDAO.readAll(args);
+      const tasks: TTask[] = result.items;
+      if (!tasks || tasks.length === 0) {
+        throw new Error('No tasks found');
+      }
       return {
         message: 'Tasks found',
         status: 'success',
-        data: tasks as TTask[],
+        data: tasks,
+        metadata: result.metadata,
       };
     } catch (error) {
       return {

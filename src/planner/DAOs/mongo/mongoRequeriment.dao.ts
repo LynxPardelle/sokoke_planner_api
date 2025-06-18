@@ -6,7 +6,7 @@ import {
   TRequeriment,
   asTRequeriment,
 } from '@src/planner/types/requeriment.type';
-import { TSearch } from '@src/shared/types/search.type';
+import { TSearch, TSearchResult } from '@src/shared/types/search.type';
 /* DTOs */
 import { CreateRequerimentDTO } from '@src/planner/DTOs/createRequeriment.dto';
 import { UpdateRequerimentDTO } from '@src/planner/DTOs/updateRequeriment.dto';
@@ -15,6 +15,8 @@ import {
   RequerimentModel,
   RequerimentDocument,
 } from '@src/planner/schemas/requeriment.schema';
+/* Services */
+import { SearchService } from '@src/shared/services/search.service';
 @Injectable()
 export class MongoDBRequerimentDAO implements TRequerimentDAO {
   constructor(
@@ -33,14 +35,12 @@ export class MongoDBRequerimentDAO implements TRequerimentDAO {
       await this._requerimentModel.findById(id);
     if (!requeriment) throw new Error('Requeriment not found');
     return asTRequeriment(requeriment);
-  }
-  async readAll(args?: TSearch<TRequeriment>): Promise<TRequeriment[]> {
-    const requeriments: RequerimentDocument[] =
-      await this._requerimentModel.find();
-    if (!requeriments) throw new Error('Requeriments not found');
-    if (!requeriments.length)
-      throw new Error("Requeriments doesn't contain anything");
-    return requeriments.map(asTRequeriment);
+  }  async readAll(args?: TSearch<TRequeriment>): Promise<TSearchResult<TRequeriment>> {
+    return await SearchService.executeSearch(
+      this._requerimentModel,
+      args,
+      asTRequeriment
+    );
   }
   async update(requeriment: UpdateRequerimentDTO): Promise<TRequeriment> {
     const requerimentUpdated: RequerimentDocument | null =

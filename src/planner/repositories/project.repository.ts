@@ -47,16 +47,20 @@ export default class ProjectRepository implements TProjectRepository {
         error: error,
       };
     }
-  }
-  async readAll(
+  }  async readAll(
     args?: TSearch<TProject>,
   ): Promise<TRepositoryResponse<TProject[]>> {
     try {
-      const projects: TProject[] = await this._projectDAO.readAll(args);
+      const result = await this._projectDAO.readAll(args);
+      const projects: TProject[] = result.items;
+      if (!projects || projects.length === 0) {
+        throw new Error('No projects found');
+      }
       return {
         message: 'Projects found',
         status: 'success',
-        data: projects as TProject[],
+        data: projects,
+        metadata: result.metadata,
       };
     } catch (error) {
       return {

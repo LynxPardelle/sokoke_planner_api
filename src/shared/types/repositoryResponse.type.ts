@@ -4,6 +4,7 @@ export type TRepositoryResponse<T> = {
     | {
       status: 'success';
       data: T;
+      metadata?: any; // Optional metadata for search results
     }
     | {
       status: 'error';
@@ -23,7 +24,7 @@ export function isTRepositoryResponse<T>(
 }
 export function isSuccessResponse<T>(
   response: TRepositoryResponse<T>,
-): response is TRepositoryResponse<T> & { status: 'success'; data: T } {
+): response is TRepositoryResponse<T> & { status: 'success'; data: T; metadata?: any } {
   return response.status === 'success' && 'data' in response;
 }
 export function isErrorResponse<T>(

@@ -59,12 +59,16 @@ export default class ProjectCategoryRepository
     args?: TSearch<TProjectCategory>,
   ): Promise<TRepositoryResponse<TProjectCategory[]>> {
     try {
-      const projectCategories: TProjectCategory[] =
-        await this._projectCategoryDAO.readAll(args);
+      const result = await this._projectCategoryDAO.readAll(args);
+      const categories = result.items;
+      if (!categories || categories.length === 0) {
+        throw new Error('No project categories found');
+      }
       return {
         message: 'Project categories found',
         status: 'success',
-        data: projectCategories as TProjectCategory[],
+        data: categories,
+        metadata: result.metadata,
       };
     } catch (error) {
       return {
