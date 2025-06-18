@@ -85,6 +85,18 @@ export const configLoader = (): TConfig => {
     apiKeys: process.env.API_KEYS ? process.env.API_KEYS.split(',') : [],
     
     // Fastify secure session key for session encryption
-    fastifySecureSessionKey: process.env.fastifySecureSessionKey ? process.env.fastifySecureSessionKey : ''
+    fastifySecureSessionKey: process.env.fastifySecureSessionKey ? process.env.fastifySecureSessionKey : '',
+    
+    // Email configuration
+    smtpHost: process.env.SMTP_HOST || 'localhost',
+    smtpPort: parseInt(process.env.SMTP_PORT || '587', 10),
+    smtpSecure: process.env.SMTP_SECURE === 'true',
+    smtpUser: process.env.SMTP_USER,
+    smtpPass: process.env.SMTP_PASS,
+    emailFrom: process.env.EMAIL_FROM || 'noreply@sokoke-planner.com',
+    
+    // Application URLs for email links
+    appUrl: process.env.APP_URL || 'http://localhost:3000',
+    frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3001',
   };
 };

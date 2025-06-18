@@ -1,4 +1,5 @@
 import { TColor } from '@src/shared/types/color.type';
+import { TUser } from '@src/user/types/user.type';
 import { TStatus } from './status.type';
 import { TProject } from './project.type';
 import { TRequeriment } from './requeriment.type';
@@ -6,6 +7,7 @@ import { TFeature } from './feature.type';
 
 export type TTask = {
   _id: string;
+  assignedUsers: (TUser | string)[];
   name: string;
   description: string;
   status: TStatus | string;

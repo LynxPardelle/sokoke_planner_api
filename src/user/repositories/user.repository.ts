@@ -16,7 +16,7 @@ export default class UserRepository implements TUserRepository {
   constructor(
     @Inject('UserDAO') private _userDAO: TUserDAO,
     private _loggerService: LoggerService,
-  ) {}
+  ) { }
   /* Create */
   async create(data: CreateUserDTO): Promise<TRepositoryResponse<TUser>> {
     try {
@@ -84,15 +84,15 @@ export default class UserRepository implements TUserRepository {
         `args: ${JSON.stringify(args)}`,
         'UserRepository.readAll',
       );
-      let user: TUser[] = await this._userDAO.readAll(args);
+      let users: TUser[] = await this._userDAO.readAll(args);
       this._loggerService.info(
-        `user: ${JSON.stringify(user)}`,
+        `users: ${JSON.stringify(users)}`,
         'UserRepository.readAll',
       );
       return {
-        message: 'User found',
+        message: 'Users found',
         status: 'success',
-        data: user,
+        data: users,
       };
     } catch (error: unknown) {
       const err = error as Error;

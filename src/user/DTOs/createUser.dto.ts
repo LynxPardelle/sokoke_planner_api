@@ -1,16 +1,21 @@
-import { IsBoolean, IsOptional, IsString, MinLength, MaxLength } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, IsDate } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { TUserCreateDTO } from '../types/user.type';
 import { IsStrongPassword, IsValidUsername, IsValidName, IsValidEmailWithInternationalChars } from '@src/shared/decorators/password-validation.decorator';
-export class CreateUserDTO implements TUserCreateDTO {  @IsOptional()
+
+export class CreateUserDTO implements TUserCreateDTO {
+  @IsOptional()
   @IsValidName()
   public name: string;
+  
   @IsOptional()
   @IsValidName()
   public lastName: string;
+  
   @IsValidEmailWithInternationalChars()
   @Transform(({ value }) => value?.toLowerCase())
   public email: string;
+  
   @IsOptional()
   @IsString()
   @IsValidUsername()
@@ -29,7 +34,16 @@ export class CreateUserDTO implements TUserCreateDTO {  @IsOptional()
   @IsOptional()
   @IsBoolean()
   @Transform(({ value }) => value === true || value === 'true')
-  public verified: boolean;  
+  public verified: boolean;
+  
+  @IsOptional()
+  @IsString()
+  public resetToken?: string;
+  
+  @IsOptional()
+  @IsDate()
+  public resetTokenExpiry?: Date;
+  
   constructor(user: TUserCreateDTO | undefined) {
     this.name = user?.name;
     this.lastName = user?.lastName;
@@ -38,19 +52,7 @@ export class CreateUserDTO implements TUserCreateDTO {  @IsOptional()
     this.password = user?.password;
     this.verifyToken = user?.verifyToken;
     this.verified = user?.verified || false;
-  }
-
-  /**
-   * Set the verification token (to be called by the service)
-   */
-  setVerificationToken(token: string): void {
-    this.verifyToken = token;
-  }
-
-  /**
-   * Set the hashed password (to be called by the service)
-   */
-  setHashedPassword(hashedPassword: string): void {
-    this.password = hashedPassword;
+    this.resetToken = user?.resetToken;
+    this.resetTokenExpiry = user?.resetTokenExpiry;
   }
 }

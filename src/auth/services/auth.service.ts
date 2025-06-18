@@ -5,6 +5,7 @@ import { UserService } from '@src/user/services/user.service';
 import { PasswordService } from '@src/shared/services/password.service';
 import { AuthUtilsService } from '@src/shared/services/auth-utils.service';
 import { LoggerService } from '@src/shared/services/logger.service';
+import { EmailService } from '@src/shared/services/email.service';
 import { 
   LoginDTO, 
   RegisterDTO, 
@@ -22,6 +23,7 @@ import {
   EmailVerificationResponse 
 } from '../types/auth-response.type';
 import { CreateUserDTO } from '@src/user/DTOs/createUser.dto';
+import { UpdateUserDTO } from '@src/user/DTOs/updateUser.dto';
 
 @Injectable()
 export class AuthService {
@@ -30,7 +32,6 @@ export class AuthService {
   private readonly jwtExpiresIn: string;
   private readonly refreshTokenExpiration: string;
   private refreshTokenStore: Map<string, { userId: string; expiresAt: Date }> = new Map();
-
   constructor(
     private readonly _configService: ConfigService,
     private readonly _jwtService: JwtService,
@@ -38,6 +39,7 @@ export class AuthService {
     private readonly _passwordService: PasswordService,
     private readonly _authUtilsService: AuthUtilsService,
     private readonly _loggerService: LoggerService,
+    private readonly _emailService: EmailService,
   ) {
     this.apiKeys = this._configService.get('apiKeys') || [];
     this.jwtSecret = this._configService.get('JWT_SECRET') || 'fallback-secret-key';
@@ -77,9 +79,27 @@ export class AuthService {
       
       if (userResponse.status !== 'success' || !userResponse.data) {
         throw new BadRequestException('Failed to create user');
-      }
-
+      }      
       const user = userResponse.data;
+
+      // Send welcome email with verification link
+      try {
+        const frontendUrl = this._configService.get<string>('frontendUrl') || 'http://localhost:3001';
+        const verificationUrl = `${frontendUrl}/verify-email?token=${user.verifyToken}`;
+        
+        await this._emailService.sendWelcomeEmail(
+          user.email,
+          `${user.name} ${user.lastName}`,
+          verificationUrl
+        );
+        
+        this._loggerService.info(`Welcome email sent to ${user.email}`, 'AuthService.register');
+      } catch (emailError) {
+        this._loggerService.error(
+          `Failed to send welcome email to ${user.email}: ${(emailError as Error).message}`,
+          'AuthService.register'
+        );
+      }
 
       // Generate tokens
       const payload = { sub: user._id, email: user.email, verified: user.verified };
@@ -246,7 +266,7 @@ export class AuthService {
 
   /**
    * Forgot password
-   */
+   */  
   async forgotPassword(forgotPasswordData: ForgotPasswordDTO): Promise<PasswordResetResponse> {
     try {
       this._loggerService.info('AuthService.forgotPassword', 'AuthService');
@@ -270,38 +290,57 @@ export class AuthService {
       }
 
       const resetToken = this._userService.generatePasswordResetToken();
-
-      // In a real application, you would save this token to the user record
-      // and send an email with the reset link
-      // For now, we'll return the token in the response (not recommended for production)
+      
+      // Save the reset token to the user record
+      const tokenSaved = await this._userService.savePasswordResetToken(user.email, resetToken);
+      
+      if (tokenSaved) {
+        // Send password reset email
+        try {
+          const frontendUrl = this._configService.get<string>('frontendUrl') || 'http://localhost:3001';
+          const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
+          
+          await this._emailService.sendPasswordResetEmail(
+            user.email,
+            `${user.name} ${user.lastName}`,
+            resetUrl
+          );
+          
+          this._loggerService.info(`Password reset email sent to ${user.email}`, 'AuthService.forgotPassword');
+        } catch (emailError) {
+          this._loggerService.error(
+            `Failed to send password reset email to ${user.email}: ${(emailError as Error).message}`,
+            'AuthService.forgotPassword'
+          );
+        }
+      }
       
       this._loggerService.info(`Password reset requested for: ${user.email}`, 'AuthService.forgotPassword');
 
       return {
         success: true,
         message: 'Password reset link has been sent to your email.',
-        resetTokenExpiration: '2 hours'
+        resetTokenExpiration: '24 hours'
       };
     } catch (error) {
       this._loggerService.error(`Forgot password failed: ${(error as Error).message}`, 'AuthService.forgotPassword');
       throw error;
     }
   }
-
   /**
    * Reset password
    */
-  async resetPassword(resetPasswordData: ResetPasswordDTO): Promise<PasswordResetResponse> {
+  async resetPassword(resetPasswordData: ResetPasswordDTO, userAgent?: string, ipAddress?: string): Promise<PasswordResetResponse> {
     try {
       this._loggerService.info('AuthService.resetPassword', 'AuthService');
 
-      // Check if token is expired
-      if (this._userService.isTokenExpired(resetPasswordData.token, 2)) {
-        throw new BadRequestException('Reset token has expired');
+      // Validate the reset token
+      const tokenValidation = await this._userService.validatePasswordResetToken(resetPasswordData.token);
+      if (!tokenValidation.valid || !tokenValidation.user) {
+        throw new BadRequestException('Invalid or expired reset token');
       }
 
-      // In a real application, you would find the user by the reset token
-      // For this example, we'll assume the token validation passed
+      const user = tokenValidation.user;
       
       // Validate new password strength
       const validation = this._userService.validatePasswordStrength(resetPasswordData.newPassword);
@@ -309,7 +348,42 @@ export class AuthService {
         throw new BadRequestException(validation.errors.join(', '));
       }
 
-      this._loggerService.info('Password reset successful', 'AuthService.resetPassword');
+      // Hash the new password
+      const hashedPassword = await this._passwordService.hashPassword(resetPasswordData.newPassword);
+        // Update user password and clear reset token
+      const updateUserData = new UpdateUserDTO({
+        ...user,
+        password: hashedPassword,
+        resetToken: '',
+        resetTokenExpiry: null,
+        updatedAt: new Date()
+      });
+
+      const updateResponse = await this._userService.update(updateUserData);
+
+      if (updateResponse.status !== 'success') {
+        throw new BadRequestException('Failed to update password');
+      }
+
+      // Send password changed notification email
+      try {
+        await this._emailService.sendPasswordChangedNotification(
+          user.email,
+          `${user.name} ${user.lastName}`,
+          new Date().toLocaleString(),
+          ipAddress || 'Unknown',
+          userAgent || 'Unknown'
+        );
+        
+        this._loggerService.info(`Password changed notification sent to ${user.email}`, 'AuthService.resetPassword');
+      } catch (emailError) {
+        this._loggerService.error(
+          `Failed to send password changed notification to ${user.email}: ${(emailError as Error).message}`,
+          'AuthService.resetPassword'
+        );
+      }
+
+      this._loggerService.info(`Password reset successful for ${user.email}`, 'AuthService.resetPassword');
 
       return {
         success: true,
@@ -345,8 +419,7 @@ export class AuthService {
 
   /**
    * Change password (for authenticated users)
-   */
-  async changePassword(userId: string, changePasswordData: ChangePasswordDTO): Promise<PasswordResetResponse> {
+   */  async changePassword(userId: string, changePasswordData: ChangePasswordDTO, userAgent?: string, ipAddress?: string): Promise<PasswordResetResponse> {
     try {
       this._loggerService.info('AuthService.changePassword', 'AuthService');
 
@@ -373,7 +446,39 @@ export class AuthService {
         throw new BadRequestException(validation.errors.join(', '));
       }
 
-      // In a real application, you would update the user's password here
+      // Hash the new password
+      const hashedPassword = await this._passwordService.hashPassword(changePasswordData.newPassword);
+        // Update user password
+      const updateUserData = new UpdateUserDTO({
+        ...user,
+        password: hashedPassword,
+        updatedAt: new Date()
+      });
+
+      const updateResponse = await this._userService.update(updateUserData);
+
+      if (updateResponse.status !== 'success') {
+        throw new BadRequestException('Failed to update password');
+      }
+
+      // Send password changed notification email
+      try {
+        await this._emailService.sendPasswordChangedNotification(
+          user.email,
+          `${user.name} ${user.lastName}`,
+          new Date().toLocaleString(),
+          ipAddress || 'Unknown',
+          userAgent || 'Unknown'
+        );
+        
+        this._loggerService.info(`Password changed notification sent to ${user.email}`, 'AuthService.changePassword');
+      } catch (emailError) {
+        this._loggerService.error(
+          `Failed to send password changed notification to ${user.email}: ${(emailError as Error).message}`,
+          'AuthService.changePassword'
+        );
+      }
+
       this._loggerService.info(`Password changed for user: ${user.email}`, 'AuthService.changePassword');
 
       return {

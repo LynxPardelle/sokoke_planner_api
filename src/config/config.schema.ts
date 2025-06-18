@@ -13,4 +13,14 @@ export const configSchema = Joi.object({
   JWT_SECRET: Joi.string().required(),
   API_KEYS: Joi.string().optional(),
   FASTIFY_SECURE_SESSION_KEY: Joi.string().optional(),
+  // Email configuration
+  SMTP_HOST: Joi.string().default('localhost'),
+  SMTP_PORT: Joi.number().default(587),
+  SMTP_SECURE: Joi.boolean().default(false),
+  SMTP_USER: Joi.string().optional(),
+  SMTP_PASS: Joi.string().optional(),
+  EMAIL_FROM: Joi.string().default('noreply@sokoke-planner.com'),
+  // Application URLs for email links
+  APP_URL: Joi.string().default('http://localhost:3000'),
+  FRONTEND_URL: Joi.string().default('http://localhost:3001'),
 });

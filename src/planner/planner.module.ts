@@ -28,6 +28,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 /* Module imports */
 import { SharedModule } from '@src/shared/shared.module';
+import { UserModule } from '@src/user/user.module';
 
 /* HTTP Controllers - Handle REST API endpoints */
 import { FeatureController } from './controllers/feature.controller';
@@ -93,12 +94,14 @@ import { MongoDBTaskDAO } from './DAOs/mongo/mongoTask.dao';
  * 3. Repositories (Data abstraction)
  * 4. DAOs (Database implementation)
  */
-@Module({
+@Module({  
   imports: [
     // MongoDB schemas for all planner entities
     MongooseModule.forFeatureAsync(plannerModuleSchemaFactory),
     // Shared utilities and common functionality
     SharedModule,
+    // User management functionality
+    UserModule,
   ],
   controllers: [
     // REST API controllers for each entity

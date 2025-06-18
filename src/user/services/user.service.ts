@@ -5,8 +5,7 @@ import UserRepository from '@src/user/repositories/user.repository';
 import { PasswordService } from '@src/shared/services/password.service';
 /* Types */
 import { TUser } from '@src/user/types/user.type';
-import { TUserRepository } from '@src/user/types/repositoryUser.type';
-import { TRepositoryResponse } from '@src/shared/types/repositoryResponse.type';
+import { getResponseData, isSuccessResponse, TRepositoryResponse } from '@src/shared/types/repositoryResponse.type';
 import { TSearch } from '@src/shared/types/search.type';
 /* DTOs */
 import { CreateUserDTO } from '@src/user/DTOs/createUser.dto';
@@ -17,7 +16,7 @@ export class UserService {
   constructor(
     private _userRepository: UserRepository,
     private _passwordService: PasswordService,
-  ) {}
+  ) { }
   author(): { [key: string]: string } {
     return {
       author: 'Lynx Pardelle',
@@ -30,13 +29,13 @@ export class UserService {
     // Hash password if provided
     if (data.password) {
       const hashedPassword = await this._passwordService.hashPassword(data.password);
-      data.setHashedPassword(hashedPassword);
+      data.password = hashedPassword;
     }
 
     // Generate verification token if not provided
     if (!data.verifyToken) {
       const verificationToken = this._passwordService.generateVerificationToken();
-      data.setVerificationToken(verificationToken);
+      data.verifyToken = verificationToken;
     }
 
     return await this._userRepository.create(data);
@@ -60,7 +59,7 @@ export class UserService {
   }
 
   /* Password Operations */
-  
+
   /**
    * Verify user password
    */
@@ -101,5 +100,103 @@ export class UserService {
    */
   generateTemporaryPassword(): string {
     return this._passwordService.generateTemporaryPassword();
+  }
+
+  /**
+   * Save password reset token for a user
+   */  async savePasswordResetToken(email: string, resetToken: string): Promise<boolean> {
+    try {
+      const expiryDate = new Date();
+      expiryDate.setHours(expiryDate.getHours() + 24); // 24 hours expiry
+
+      const usersWithEmail: TRepositoryResponse<TUser[]> = await this._userRepository.readAll({
+        filters: { email },
+        pagination: {
+          page: 1,
+          limit: 1
+        }
+      });
+      const user: TUser | undefined = isSuccessResponse(usersWithEmail) ? getResponseData(usersWithEmail)[0] : undefined;
+
+      if (!user) {
+        console.error(`User with email ${email} not found`);
+        return false;
+      }
+      const updateResult = await this._userRepository.update({
+        ...user,
+        resetToken,
+        resetTokenExpiry: expiryDate,
+        updatedAt: new Date()
+      });
+
+      return updateResult.status === 'success';
+    } catch (error) {
+      console.error(
+        `Failed to save reset token for ${email}: ${(error as Error).message}`
+      );
+      return false;
+    }
+  }
+
+  /**
+   * Validate password reset token
+   */
+  async validatePasswordResetToken(token: string): Promise<{ valid: boolean; user?: TUser }> {
+    try {
+      const usersWithToken: TRepositoryResponse<TUser[]> = await this._userRepository.readAll({
+        filters: { resetToken: token },
+        pagination: {
+          page: 1,
+          limit: 1
+        }
+      });
+      const user: TUser | undefined = isSuccessResponse(usersWithToken) ? getResponseData(usersWithToken)[0] : undefined;
+
+      // Check if token has expired
+      if (!user?.resetTokenExpiry || new Date() > user.resetTokenExpiry) {
+        return { valid: false };
+      }
+
+      return { valid: true, user };
+    } catch (error) {
+      console.error(
+        `Failed to validate reset token: ${(error as Error).message}`
+      );
+      return { valid: false };
+    }
+  }
+
+  /**
+   * Clear password reset token
+   */
+  async clearPasswordResetToken(email: string): Promise<boolean> {
+    try {
+      const usersWithEmail: TRepositoryResponse<TUser[]> = await this._userRepository.readAll({
+        filters: { email },
+        pagination: {
+          page: 1,
+          limit: 1
+        }
+      });
+      const user: TUser | undefined = isSuccessResponse(usersWithEmail) ? getResponseData(usersWithEmail)[0] : undefined;
+
+      if (!user) {
+        console.error(`User with email ${email} not found`);
+        return false;
+      }
+      const updateResult = await this._userRepository.update({
+        ...user,
+        resetToken: '',
+        resetTokenExpiry: null,
+        updatedAt: new Date()
+      });
+
+      return updateResult.status === 'success';
+    } catch (error) {
+      console.error(
+        `Failed to clear reset token for ${email}: ${(error as Error).message}`
+      );
+      return false;
+    }
   }
 }

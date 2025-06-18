@@ -34,6 +34,9 @@ import { UpdateProjectDTO } from '../DTOs/updateProject.dto';
 
 /* Shared services */
 import { LoggerService } from '@src/shared/services/logger.service';
+import { EmailService } from '@src/shared/services/email.service';
+import { UserService } from '@src/user/services/user.service';
+import { ConfigService } from '@nestjs/config';
 
 /**
  * ProjectService class implementing the project repository interface
@@ -52,10 +55,13 @@ export class ProjectService implements TProjectRepository {
    * 
    * @param {ProjectRepository} _projectRepository - Data access layer for projects
    * @param {LoggerService} _loggerService - Logging service for audit trail
-   */
+   */  
   constructor(
     private _projectRepository: ProjectRepository,
     private _loggerService: LoggerService,
+    private _emailService: EmailService,
+    private _userService: UserService,
+    private _configService: ConfigService,
   ) {}
 
   /**
@@ -105,13 +111,69 @@ export class ProjectService implements TProjectRepository {
    *   console.error("Error:", result.message);
    * }
    * ```
-   */
+   */  
   async create(data: CreateProjectDTO): Promise<TRepositoryResponse<TProject>> {
     this._loggerService.info(
       `Creating project: ${JSON.stringify(data)}`,
       'ProjectService.create',
     );
-    return await this._projectRepository.create(data);
+    
+    const result = await this._projectRepository.create(data);
+    
+    // Send email notifications to project owners if project was created successfully
+    if (result.status === 'success' && result.data && data.owners?.length > 0) {
+      try {
+        await this.notifyProjectAssignment(result.data, data.owners, 'System');
+      } catch (emailError) {
+        this._loggerService.error(
+          `Failed to send project assignment notifications: ${(emailError as Error).message}`,
+          'ProjectService.create'
+        );
+      }
+    }
+    
+    return result;
+  }
+
+  /**
+   * Send project assignment notifications to users
+   * 
+   * @param project - The project that was assigned
+   * @param userIds - Array of user IDs to notify
+   * @param assignedBy - Name of the user who made the assignment
+   */
+  private async notifyProjectAssignment(project: TProject, userIds: string[], assignedBy: string): Promise<void> {
+    const frontendUrl = this._configService.get<string>('frontendUrl') || 'http://localhost:3001';
+    const projectUrl = `${frontendUrl}/projects/${project._id}`;
+    
+    for (const userId of userIds) {
+      try {
+        const userResponse = await this._userService.read(userId);
+        if (userResponse.status === 'success' && userResponse.data) {
+          const user = userResponse.data;
+          
+          await this._emailService.sendProjectAssignmentNotification(
+            user.email,
+            `${user.name} ${user.lastName}`,
+            project.name || 'Untitled Project',
+            project.description || 'No description provided',
+            assignedBy,
+            project.endDate ? project.endDate.toLocaleDateString() : 'No due date',
+            projectUrl
+          );
+          
+          this._loggerService.info(
+            `Project assignment notification sent to ${user.email} for project ${project.name}`,
+            'ProjectService.notifyProjectAssignment'
+          );
+        }
+      } catch (error) {
+        this._loggerService.error(
+          `Failed to send project assignment notification to user ${userId}: ${(error as Error).message}`,
+          'ProjectService.notifyProjectAssignment'
+        );
+      }
+    }
   }
 
   /**
@@ -214,13 +276,50 @@ export class ProjectService implements TProjectRepository {
    *   console.log("Project updated successfully");
    * }
    * ```
-   */
+   */  
   async update(data: UpdateProjectDTO): Promise<TRepositoryResponse<TProject>> {
     this._loggerService.info(
       `Updating project: ${JSON.stringify(data)}`,
       'ProjectService.update',
     );
-    return await this._projectRepository.update(data);
+
+    // Get the current project to compare owners
+    let originalProject: TProject | null = null;
+    try {
+      const originalResponse = await this._projectRepository.read(data._id);
+      if (originalResponse.status === 'success' && originalResponse.data) {
+        originalProject = originalResponse.data;
+      }
+    } catch (error) {
+      this._loggerService.warn(
+        `Could not fetch original project for comparison: ${(error as Error).message}`,
+        'ProjectService.update'
+      );
+    }
+
+    const result = await this._projectRepository.update(data);
+    
+    // Send notifications to newly assigned owners
+    if (result.status === 'success' && result.data && data.owners && originalProject) {
+      try {
+        const originalOwners = originalProject.owners?.map(owner => 
+          typeof owner === 'string' ? owner : owner._id
+        ) || [];
+        
+        const newOwners = data.owners.filter(ownerId => !originalOwners.includes(ownerId));
+        
+        if (newOwners.length > 0) {
+          await this.notifyProjectAssignment(result.data, newOwners, 'System');
+        }
+      } catch (emailError) {
+        this._loggerService.error(
+          `Failed to send project assignment notifications: ${(emailError as Error).message}`,
+          'ProjectService.update'
+        );
+      }
+    }
+    
+    return result;
   }
 
   /**

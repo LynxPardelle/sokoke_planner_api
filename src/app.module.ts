@@ -16,6 +16,7 @@
 
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ScheduleModule } from '@nestjs/schedule';
 
 /* Configuration imports */
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -24,6 +25,7 @@ import { configSchema } from './config/config.schema';
 
 /* Feature modules */
 import { SharedModule } from './shared/shared.module';
+import { NotificationModule } from './shared/notification.module';
 import { PlannerModule } from './planner/planner.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
@@ -41,7 +43,7 @@ import { AppService } from './core/services/app.service';
  * - Provides core application services
  * - Sets up MongoDB connection with environment-based URI
  */
-@Module({
+@Module({  
   imports: [
     // Global configuration module with validation schema
     ConfigModule.forRoot({
@@ -51,6 +53,8 @@ import { AppService } from './core/services/app.service';
       validationSchema: configSchema, // Joi validation schema for environment variables
     }),
 
+    // Enable scheduled tasks and cron jobs
+    ScheduleModule.forRoot(),    
     // Feature modules
     AuthModule, // Authentication and authorization
     PlannerModule, // Core planning functionality (projects, tasks, etc.)
@@ -66,6 +70,9 @@ import { AppService } from './core/services/app.service';
     
     // Shared utilities and common functionality
     SharedModule,
+    
+    // Notification and scheduled tasks
+    NotificationModule,
   ],
   controllers: [AppController], // Root controller for health checks and basic endpoints
   providers: [AppService, ConfigService], // Core application services

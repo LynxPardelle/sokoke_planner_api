@@ -14,6 +14,9 @@ import { isTRequeriment, TRequeriment } from '../types/requeriment.type';
 import { isTFeature, TFeature } from '../types/feature.type';
 export class CreateTaskDTO extends colorDTO implements TTaskCreateDTO {
   @IsOptional()
+  @IsArray()
+  public assignedUsers?: string[];
+  @IsOptional()
   @IsString()
   public name: string;
   @IsOptional()

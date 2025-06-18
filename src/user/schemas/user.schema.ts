@@ -8,7 +8,7 @@ export class User implements Omit<TUser, '_id'> {
   public name: string;
   @Prop({ required: true })
   public lastName: string;
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true, lowercase: true })
   public email: string;
   @Prop({ required: true })
   public username: string;
@@ -22,6 +22,10 @@ export class User implements Omit<TUser, '_id'> {
   public verifyToken: string;
   @Prop({ required: true, default: false })
   public verified: boolean;
+  @Prop({ default: '', unique: true })
+  public resetToken?: string;
+  @Prop({ default: null })
+  public resetTokenExpiry?: Date;
 }
 
 export const userSchema = SchemaFactory.createForClass(User);

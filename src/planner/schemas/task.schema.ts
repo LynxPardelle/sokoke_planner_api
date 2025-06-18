@@ -2,6 +2,7 @@ import { HydratedDocument, Model } from 'mongoose';
 import * as mongoose from 'mongoose';
 import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
 /* Types */
+import { TUser } from '@src/user/types/user.type';
 import { TProject } from '../types/project.type';
 import { TTask } from '../types/task.type';
 import { TRequeriment } from '../types/requeriment.type';
@@ -9,6 +10,14 @@ import { TFeature } from '../types/feature.type';
 import { TStatus } from '../types/status.type';
 @Schema()
 export class Task implements Omit<TTask, '_id'> {
+  @Prop({
+    default: [],
+    schema: true,
+    schemaName: 'User',
+    type: [mongoose.Schema.Types.ObjectId || String],
+    ref: 'User',
+  })
+  public assignedUsers: (TUser | string)[];
   @Prop({ required: true })
   public name: string;
   @Prop({ required: true })

@@ -24,6 +24,16 @@ export type TConfig = {
   jwtSecret: string;
   apiKeys: string[];
   fastifySecureSessionKey: string;
+  // Email configuration
+  smtpHost: string;
+  smtpPort: number;
+  smtpSecure: boolean;
+  smtpUser?: string;
+  smtpPass?: string;
+  emailFrom: string;
+  // Application URLs
+  appUrl: string;
+  frontendUrl: string;
 };
 export const TConfigGuard = (value: unknown): value is TConfig =>
   typeof value === 'object' &&
@@ -37,6 +47,12 @@ export const TConfigGuard = (value: unknown): value is TConfig =>
     'jwtSecret',
     'apiKeys',
     'fastifySecureSessionKey',
+    'smtpHost',
+    'smtpPort',
+    'smtpSecure',
+    'emailFrom',
+    'appUrl',
+    'frontendUrl',
   ]
     .map((key) => value.hasOwnProperty(key))
     .every((hasKey) => hasKey);

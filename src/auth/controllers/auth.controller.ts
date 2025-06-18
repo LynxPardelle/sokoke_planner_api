@@ -136,17 +136,20 @@ export class AuthController {
       throw error;
     }
   }
-
   /**
    * Reset password with token
    * POST /auth/reset-password
    */
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
-  async resetPassword(@Body() resetPasswordData: ResetPasswordDTO): Promise<PasswordResetResponse> {
+  async resetPassword(
+    @Body() resetPasswordData: ResetPasswordDTO,
+    @Headers('user-agent') userAgent: string,
+    @Ip() ipAddress: string,
+  ): Promise<PasswordResetResponse> {
     try {
       this._loggerService.info('AuthController.resetPassword', 'AuthController');
-      return await this._authService.resetPassword(resetPasswordData);
+      return await this._authService.resetPassword(resetPasswordData, userAgent, ipAddress);
     } catch (error) {
       this._loggerService.error(`Password reset failed: ${(error as Error).message}`, 'AuthController.resetPassword');
       throw error;
@@ -168,7 +171,6 @@ export class AuthController {
       throw error;
     }
   }
-
   /**
    * Change password (for authenticated users)
    * POST /auth/change-password
@@ -179,6 +181,8 @@ export class AuthController {
   async changePassword(
     @Body() changePasswordData: ChangePasswordDTO,
     @Headers('authorization') authHeader: string,
+    @Headers('user-agent') userAgent: string,
+    @Ip() ipAddress: string,
   ): Promise<PasswordResetResponse> {
     try {
       this._loggerService.info('AuthController.changePassword', 'AuthController');
@@ -194,7 +198,7 @@ export class AuthController {
         throw new BadRequestException('Invalid or expired token');
       }
 
-      return await this._authService.changePassword(tokenValidation.user.id, changePasswordData);
+      return await this._authService.changePassword(tokenValidation.user.id, changePasswordData, userAgent, ipAddress);
     } catch (error) {
       this._loggerService.error(`Change password failed: ${(error as Error).message}`, 'AuthController.changePassword');
       throw error;

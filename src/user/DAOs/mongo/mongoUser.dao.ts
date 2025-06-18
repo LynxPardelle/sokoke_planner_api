@@ -41,7 +41,11 @@ export class MongoDBUserDAO implements TUserDAO {
     return asTUser(user);
   }
   async readAll(args?: TSearch<TUser>): Promise<TUser[]> {
-    const user: UserDocument[] = await this._userModel.find();
+    const user: UserDocument[] = await this._userModel.find(
+      args?.filters ? { ...args.filters } : {},
+      null,
+      args?.pagination ? { skip: (args.pagination.page - 1) * args.pagination.limit, limit: args.pagination.limit } : {}
+    );
     if (!user) {
       throw new Error('User not found');
     }

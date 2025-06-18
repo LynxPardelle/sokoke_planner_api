@@ -9,6 +9,8 @@ export type TUser = {
   updatedAt: Date;
   verifyToken: string;
   verified: boolean;
+  resetToken?: string;
+  resetTokenExpiry?: Date;
 };
 
 export type TUserCreateDTO = Partial<Omit<TUser, '_id'>>;
@@ -26,6 +28,7 @@ export function isTUser(arg: any): arg is TUser {
     arg.updatedAt !== 'undefined' &&
     arg.verifyToken !== 'undefined' &&
     arg.verified !== 'undefined'
+    // resetToken and resetTokenExpiry are optional, so no need to check
   );
 }
 export function isTUserArray(arg: any): arg is TUser[] {

@@ -32,6 +32,7 @@ Sokoke Planner API is a robust, scalable REST API designed for project planning 
 - **Project Management**: Complete CRUD operations for projects with categories and subcategories
 - **Task Management**: Detailed task tracking with status, requirements, and features
 - **User Authentication**: JWT-based authentication with refresh tokens and email verification
+- **Email Notifications**: Comprehensive email system with automated notifications for user registration, password resets, project/task assignments, and deadline reminders
 - **Role-based Authorization**: Secure access control with API key and JWT strategies
 - **Data Validation**: Comprehensive input validation using class-validator and DTOs
 - **Error Handling**: Centralized error handling with detailed logging
@@ -92,11 +93,16 @@ The API follows Domain-Driven Design (DDD) principles with a modular architectur
    API_KEY=your-api-key
    PORT=3000
    
-   # Email (optional)
+   # Email Configuration (SMTP)
    SMTP_HOST=smtp.gmail.com
    SMTP_PORT=587
+   SMTP_SECURE=false
    SMTP_USER=your-email@gmail.com
    SMTP_PASS=your-app-password
+   EMAIL_FROM="Sokoke Planner <noreply@sokoke-planner.com>"
+   
+   # Application URLs
+   APP_URL=http://localhost:3000
    ```
 
 ### With Docker Compose (Recommended)
