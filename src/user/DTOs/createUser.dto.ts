@@ -29,7 +29,8 @@ export class CreateUserDTO implements TUserCreateDTO {  @IsOptional()
   @IsOptional()
   @IsBoolean()
   @Transform(({ value }) => value === true || value === 'true')
-  public verified: boolean;  constructor(user: TUserCreateDTO | undefined) {
+  public verified: boolean;  
+  constructor(user: TUserCreateDTO | undefined) {
     this.name = user?.name;
     this.lastName = user?.lastName;
     this.email = user?.email?.toLowerCase();

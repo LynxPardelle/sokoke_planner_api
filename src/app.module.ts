@@ -1,38 +1,73 @@
+/**
+ * Sokoke Planner API - Root Application Module
+ * 
+ * This is the root module of the application that orchestrates all other modules
+ * and provides global configuration for the entire application.
+ * 
+ * Features:
+ * - Global configuration management with validation
+ * - MongoDB connection with Mongoose
+ * - Module imports for all feature modules
+ * - Environment-based configuration loading
+ * 
+ * @author Lynx Pardelle
+ * @version 1.0.0
+ */
+
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-/* Config */
+
+/* Configuration imports */
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { configLoader } from './config/config.loader';
 import { configSchema } from './config/config.schema';
-/* Modules */
+
+/* Feature modules */
 import { SharedModule } from './shared/shared.module';
 import { PlannerModule } from './planner/planner.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-/* Controllers */
+
+/* Core application components */
 import { AppController } from './core/controllers/app.controller';
-/* Services */
 import { AppService } from './core/services/app.service';
+
+/**
+ * Root application module that configures and imports all feature modules
+ * 
+ * This module:
+ * - Configures global settings (configuration, database)
+ * - Imports all feature modules (Auth, Planner, User)
+ * - Provides core application services
+ * - Sets up MongoDB connection with environment-based URI
+ */
 @Module({
   imports: [
+    // Global configuration module with validation schema
     ConfigModule.forRoot({
-      isGlobal: true,
-      cache: true,
-      load: [configLoader],
-      validationSchema: configSchema,
+      isGlobal: true, // Makes configuration available globally
+      cache: true, // Cache configuration for better performance
+      load: [configLoader], // Custom configuration loader
+      validationSchema: configSchema, // Joi validation schema for environment variables
     }),
-    AuthModule,
-    PlannerModule,
-    UserModule,
+
+    // Feature modules
+    AuthModule, // Authentication and authorization
+    PlannerModule, // Core planning functionality (projects, tasks, etc.)
+    UserModule, // User management
+    
+    // Database connection with async configuration
     MongooseModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('mongodbUri'),
+        uri: configService.get<string>('mongodbUri'), // Get MongoDB URI from config
       }),
-      inject: [ConfigService],
+      inject: [ConfigService], // Inject ConfigService for async factory
     }),
+    
+    // Shared utilities and common functionality
     SharedModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, ConfigService],
+  controllers: [AppController], // Root controller for health checks and basic endpoints
+  providers: [AppService, ConfigService], // Core application services
 })
 export class AppModule {}
