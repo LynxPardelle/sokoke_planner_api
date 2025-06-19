@@ -31,7 +31,7 @@ import {
  * Provides sensible defaults for development and validates critical settings.
  * 
  * Environment Variables:
- * - PORT: Server port number (default: 3000)
+ * - PORT: Server port number (default: 4003)
  * - LOGGER_LEVEL: Logging level (default: 'log')
  * - NODE_ENV: Environment name (default: 'development')
  * - PERSISTENCE: Database type (default: 'mongodb')
@@ -58,35 +58,40 @@ import {
 export const configLoader = (): TConfig => {
   return {
     // Server configuration
-    port: process.env.PORT || 3000,
-    
+    port: process.env.PORT || 4003,
+
     // Logging configuration with validation
     loggerLevel: TLoggerLevelGuard(process.env.LOGGER_LEVEL)
       ? process.env.LOGGER_LEVEL
       : 'log',
-    
+
     // Environment configuration with validation
     nodeEnv: TNodeEnvGuard(process.env.NODE_ENV)
       ? process.env.NODE_ENV
       : 'development',
-    
+
     // Database persistence type with validation
     persistence: TPersistenceGuard(process.env.PERSISTENCE)
       ? process.env.PERSISTENCE
       : 'mongodb',
-    
-    // Database connection string (empty string triggers validation error in production)
-    mongodbUri: process.env.MONGODB_URI || '',
-    
+    // Database connection configuration
+    mongodbUri: process.env.MONGODB_URI,
+    sqlHost: process.env.SQL_HOST,
+    sqlPort: process.env.SQL_PORT ? parseInt(process.env.SQL_PORT, 10) : undefined,
+    sqlUsername: process.env.SQL_USERNAME,
+    sqlPassword: process.env.SQL_PASSWORD,
+    sqlDatabase: process.env.SQL_DATABASE,
+    sqlitePath: process.env.SQLITE_PATH,
+
     // JWT secret for token signing (empty string triggers validation error)
     jwtSecret: process.env.JWT_SECRET || '',
-    
+
     // API keys for external access (comma-separated list)
     apiKeys: process.env.API_KEYS ? process.env.API_KEYS.split(',') : [],
-    
+
     // Fastify secure session key for session encryption
     fastifySecureSessionKey: process.env.fastifySecureSessionKey ? process.env.fastifySecureSessionKey : '',
-    
+
     // Email configuration
     smtpHost: process.env.SMTP_HOST || 'localhost',
     smtpPort: parseInt(process.env.SMTP_PORT || '587', 10),
@@ -94,9 +99,9 @@ export const configLoader = (): TConfig => {
     smtpUser: process.env.SMTP_USER,
     smtpPass: process.env.SMTP_PASS,
     emailFrom: process.env.EMAIL_FROM || 'noreply@sokoke-planner.com',
-    
+
     // Application URLs for email links
-    appUrl: process.env.APP_URL || 'http://localhost:3000',
+    appUrl: process.env.APP_URL || 'http://localhost:4003',
     frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3001',
   };
 };

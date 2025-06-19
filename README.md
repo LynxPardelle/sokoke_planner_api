@@ -91,7 +91,7 @@ The API follows Domain-Driven Design (DDD) principles with a modular architectur
    
    # API Configuration
    API_KEY=your-api-key
-   PORT=3000
+   PORT=4003
    
    # Email Configuration (SMTP)
    SMTP_HOST=smtp.gmail.com
@@ -102,7 +102,7 @@ The API follows Domain-Driven Design (DDD) principles with a modular architectur
    EMAIL_FROM="Sokoke Planner <noreply@sokoke-planner.com>"
    
    # Application URLs
-   APP_URL=http://localhost:3000
+   APP_URL=http://localhost:4003
    ```
 
 ### With Docker Compose (Recommended)
@@ -166,7 +166,7 @@ If you prefer not to use Docker:
 ### Base URL
 
 ```text
-http://localhost:3000
+http://localhost:4003
 ```
 
 ### Authentication
@@ -310,7 +310,7 @@ JWT_REFRESH_EXPIRES_IN=7d
 API_KEY=your-api-key
 
 # Server
-PORT=3000
+PORT=4003
 NODE_ENV=development
 
 # Logging

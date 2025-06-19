@@ -29,6 +29,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 /* Module imports */
 import { SharedModule } from '@src/shared/shared.module';
 import { UserModule } from '@src/user/user.module';
+import { DatabaseModule } from '@src/config/database.module';
 
 /* HTTP Controllers - Handle REST API endpoints */
 import { FeatureController } from './controllers/feature.controller';
@@ -78,6 +79,24 @@ import { MongoDBRequerimentDAO } from './DAOs/mongo/mongoRequeriment.dao';
 import { MongoDBStatusDAO } from './DAOs/mongo/mongoStatus.dao';
 import { MongoDBTaskDAO } from './DAOs/mongo/mongoTask.dao';
 
+/* SQL-specific Data Access Objects */
+import { SQLFeatureDAO } from './DAOs/sql/sqlFeature.dao';
+import { SQLProjectDAO } from './DAOs/sql/sqlProject.dao';
+import { SQLProjectCategoryDAO } from './DAOs/sql/sqlProjectCategory.dao';
+import { SQLProjectSubCategoryDAO } from './DAOs/sql/sqlProjectSubCategory.dao';
+import { SQLRequerimentDAO } from './DAOs/sql/sqlRequeriment.dao';
+import { SQLStatusDAO } from './DAOs/sql/sqlStatus.dao';
+import { SQLTaskDAO } from './DAOs/sql/sqlTask.dao';
+
+/* TypeORM Entities */
+import { FeatureEntity } from './entities/feature.entity';
+import { ProjectEntity } from './entities/project.entity';
+import { ProjectCategoryEntity } from './entities/projectCategory.entity';
+import { ProjectSubCategoryEntity } from './entities/projectSubCategory.entity';
+import { RequerimentEntity } from './entities/requeriment.entity';
+import { StatusEntity } from './entities/status.entity';
+import { TaskEntity } from './entities/task.entity';
+
 /**
  * Planner Module Configuration
  * 
@@ -94,10 +113,20 @@ import { MongoDBTaskDAO } from './DAOs/mongo/mongoTask.dao';
  * 3. Repositories (Data abstraction)
  * 4. DAOs (Database implementation)
  */
-@Module({  
+@Module({
   imports: [
     // MongoDB schemas for all planner entities
     MongooseModule.forFeatureAsync(plannerModuleSchemaFactory),
+    // TypeORM entities for SQL databases
+    DatabaseModule.forFeature([
+      FeatureEntity,
+      ProjectEntity,
+      ProjectCategoryEntity,
+      ProjectSubCategoryEntity,
+      RequerimentEntity,
+      StatusEntity,
+      TaskEntity,
+    ]),
     // Shared utilities and common functionality
     SharedModule,
     // User management functionality
@@ -122,7 +151,7 @@ import { MongoDBTaskDAO } from './DAOs/mongo/mongoTask.dao';
     RequerimentService,
     StatusService,
     TaskService,
-    
+
     /* Data Access Repositories */
     FeatureRepository,
     ProjectRepository,
@@ -131,7 +160,7 @@ import { MongoDBTaskDAO } from './DAOs/mongo/mongoTask.dao';
     RequerimentRepository,
     StatusRepository,
     TaskRepository,
-    
+
     /* DAO Factory Providers */
     FeatureDaoFactory,
     ProjectDaoFactory,
@@ -140,7 +169,6 @@ import { MongoDBTaskDAO } from './DAOs/mongo/mongoTask.dao';
     StatusDaoFactory,
     RequerimentDaoFactory,
     TaskDaoFactory,
-    
     /* MongoDB Data Access Objects */
     MongoDBFeatureDAO,
     MongoDBProjectDAO,
@@ -149,6 +177,15 @@ import { MongoDBTaskDAO } from './DAOs/mongo/mongoTask.dao';
     MongoDBRequerimentDAO,
     MongoDBStatusDAO,
     MongoDBTaskDAO,
+
+    /* SQL Data Access Objects */
+    SQLFeatureDAO,
+    SQLProjectDAO,
+    SQLProjectCategoryDAO,
+    SQLProjectSubCategoryDAO,
+    SQLRequerimentDAO,
+    SQLStatusDAO,
+    SQLTaskDAO,
   ],
   exports: [
     /* Export services for use in other modules */
@@ -159,7 +196,7 @@ import { MongoDBTaskDAO } from './DAOs/mongo/mongoTask.dao';
     RequerimentService,
     StatusService,
     TaskService,
-    
+
     /* Export repositories for direct data access if needed */
     FeatureRepository,
     ProjectRepository,
@@ -168,7 +205,7 @@ import { MongoDBTaskDAO } from './DAOs/mongo/mongoTask.dao';
     RequerimentRepository,
     StatusRepository,
     TaskRepository,
-    
+
     /* Export factories for creating DAOs in other modules */
     FeatureDaoFactory,
     ProjectDaoFactory,
@@ -177,9 +214,9 @@ import { MongoDBTaskDAO } from './DAOs/mongo/mongoTask.dao';
     StatusDaoFactory,
     RequerimentDaoFactory,
     TaskDaoFactory,
-    
+
     /* Export MongoDB module for schema access */
     MongooseModule,
   ],
 })
-export class PlannerModule {}
+export class PlannerModule { }

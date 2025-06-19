@@ -6,7 +6,7 @@ This document provides a comprehensive reference for all API endpoints available
 
 ## 🔗 Base Information
 
-- **Base URL**: `http://localhost:3000` (development) / `https://api.sokoke.com` (production)
+- **Base URL**: `http://localhost:4003` (development) / `https://api.sokoke.com` (production)
 - **API Version**: v1
 - **Content-Type**: `application/json`
 - **Authentication**: JWT Bearer Token or API Key

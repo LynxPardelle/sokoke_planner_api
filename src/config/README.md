@@ -48,7 +48,7 @@ JWT_REFRESH_EXPIRES_IN=7d
 API_KEY=your-secure-api-key-for-external-access
 
 # Server Configuration
-PORT=3000
+PORT=4003
 NODE_ENV=development
 
 # Logging
@@ -64,7 +64,7 @@ SMTP_PASS=your-app-password
 SMTP_FROM=noreply@yourdomain.com
 
 # CORS Configuration
-CORS_ORIGINS=http://localhost:4200,http://localhost:3000
+CORS_ORIGINS=http://localhost:4200,http://localhost:4003
 
 # Rate Limiting
 RATE_LIMIT_TTL=60
@@ -169,9 +169,9 @@ interface ServerConfig {
 
 ```env
 # Development
-PORT=3000
+PORT=4003
 NODE_ENV=development
-CORS_ORIGINS=http://localhost:4200,http://localhost:3000
+CORS_ORIGINS=http://localhost:4200,http://localhost:4003
 
 # Production
 PORT=8080
@@ -283,7 +283,7 @@ interface CorsConfig {
 
 ```env
 # Development (permissive)
-CORS_ORIGINS=http://localhost:3000,http://localhost:4200,http://localhost:8080
+CORS_ORIGINS=http://localhost:4003,http://localhost:4200,http://localhost:8080
 
 # Production (restrictive)
 CORS_ORIGINS=https://app.yourdomain.com,https://admin.yourdomain.com
@@ -305,7 +305,7 @@ services:
     environment:
       - NODE_ENV=production
     ports:
-      - "3000:3000"
+      - "4003:4003"
 ```
 
 ### Docker-specific Variables
@@ -407,7 +407,7 @@ export const configSchema = Joi.object({
   JWT_REFRESH_EXPIRES_IN: Joi.string().default('7d'),
   
   // Server
-  PORT: Joi.number().port().default(3000),
+  PORT: Joi.number().port().default(4003),
   NODE_ENV: Joi.string()
     .valid('development', 'production', 'test')
     .default('development'),
@@ -452,7 +452,7 @@ export const configLoader = () => ({
   },
   
   // Server
-  port: parseInt(process.env.PORT, 10) || 3000,
+  port: parseInt(process.env.PORT, 10) || 4003,
   nodeEnv: process.env.NODE_ENV || 'development',
   
   // CORS

@@ -113,7 +113,7 @@ export class TaskService implements TTaskRepository {
               'System', // assignedBy - could be passed from controller
               newTask.data.endDate.toLocaleDateString(),
               'Normal', // priority - could be mapped from priority number
-              `${process.env.FRONTEND_URL || 'http://localhost:3000'}/tasks/${newTask.data._id}`,
+              `${process.env.FRONTEND_URL || 'http://localhost:4003'}/tasks/${newTask.data._id}`,
             );
             this._loggerService.info(
               `Task assignment email sent to ${user.email}`,
@@ -179,7 +179,7 @@ export class TaskService implements TTaskRepository {
               'System', // assignedBy - could be passed from controller
               updatedTask.data.endDate.toLocaleDateString(),
               'Normal', // priority - could be mapped from priority number
-              `${process.env.FRONTEND_URL || 'http://localhost:3000'}/tasks/${updatedTask.data._id}`,
+              `${process.env.FRONTEND_URL || 'http://localhost:4003'}/tasks/${updatedTask.data._id}`,
             );
             this._loggerService.info(
               `Task assignment email sent to ${user.email}`,

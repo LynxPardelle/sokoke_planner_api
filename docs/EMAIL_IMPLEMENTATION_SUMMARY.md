@@ -196,7 +196,7 @@ SMTP_PASS=your-app-password
 EMAIL_FROM="Sokoke Planner <noreply@sokoke-planner.com>"
 
 # Application URLs
-APP_URL=http://localhost:3000
+APP_URL=http://localhost:4003
 FRONTEND_URL=http://localhost:3001
 ```
 

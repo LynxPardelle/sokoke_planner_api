@@ -22,6 +22,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { configLoader } from './config/config.loader';
 import { configSchema } from './config/config.schema';
+import { DatabaseModule } from './config/database.module';
 
 /* Feature modules */
 import { SharedModule } from './shared/shared.module';
@@ -43,7 +44,7 @@ import { AppService } from './core/services/app.service';
  * - Provides core application services
  * - Sets up MongoDB connection with environment-based URI
  */
-@Module({  
+@Module({
   imports: [
     // Global configuration module with validation schema
     ConfigModule.forRoot({
@@ -52,29 +53,39 @@ import { AppService } from './core/services/app.service';
       load: [configLoader], // Custom configuration loader
       validationSchema: configSchema, // Joi validation schema for environment variables
     }),
-
     // Enable scheduled tasks and cron jobs
-    ScheduleModule.forRoot(),    
+    ScheduleModule.forRoot(),
     // Feature modules
     AuthModule, // Authentication and authorization
     PlannerModule, // Core planning functionality (projects, tasks, etc.)
     UserModule, // User management
-    
-    // Database connection with async configuration
+
+    // Database connections - conditional based on persistence type
+    DatabaseModule.forRoot(), // TypeORM for SQL databases
     MongooseModule.forRootAsync({
-      useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('mongodbUri'), // Get MongoDB URI from config
-      }),
+      useFactory: (configService: ConfigService) => {
+        const persistence = configService.get<string>('persistence');
+        if (persistence === 'mongodb') {
+          return {
+            uri: configService.get<string>('mongodbUri'), // Get MongoDB URI from config
+          };
+        }
+        // Return minimal config for non-MongoDB persistence
+        return {
+          uri: 'mongodb://localhost/placeholder',
+          connectionName: 'placeholder',
+        };
+      },
       inject: [ConfigService], // Inject ConfigService for async factory
     }),
-    
+
     // Shared utilities and common functionality
     SharedModule,
-    
+
     // Notification and scheduled tasks
     NotificationModule,
   ],
   controllers: [AppController], // Root controller for health checks and basic endpoints
   providers: [AppService, ConfigService], // Core application services
 })
-export class AppModule {}
+export class AppModule { }

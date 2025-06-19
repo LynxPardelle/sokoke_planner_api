@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 /* Modules */
 import { SharedModule } from '@src/shared/shared.module';
+import { DatabaseModule } from '@src/config/database.module';
 /* Controllers */
 import { UserController } from './controllers/user.controller';
 /* Services */
@@ -14,13 +15,16 @@ import { UserDaoFactory } from './DAOs/user.factory';
 import { userModuleSchemaFactory } from './schemas/user.module.schema.factory';
 /* DAOs */
 import { MongoDBUserDAO } from './DAOs/mongo/mongoUser.dao';
+import { SQLUserDAO } from './DAOs/sql/sqlUser.dao';
+/* Entities */
+import { UserEntity } from './entities/user.entity';
 @Module({
   imports: [
     MongooseModule.forFeatureAsync(userModuleSchemaFactory),
+    DatabaseModule.forFeature([UserEntity]),
     SharedModule,
   ],
-  controllers: [UserController],
-  providers: [
+  controllers: [UserController], providers: [
     /* Services */
     UserService,
     /* Repositories */
@@ -29,8 +33,8 @@ import { MongoDBUserDAO } from './DAOs/mongo/mongoUser.dao';
     UserDaoFactory,
     /* DAOs */
     MongoDBUserDAO,
-  ],
-  exports: [
+    SQLUserDAO,
+  ], exports: [
     /* Services */
     UserService,
     /* Repositories */
@@ -39,8 +43,9 @@ import { MongoDBUserDAO } from './DAOs/mongo/mongoUser.dao';
     UserDaoFactory,
     /* DAOs */
     MongoDBUserDAO,
+    SQLUserDAO,
     /* MongoDB */
     MongooseModule,
   ],
 })
-export class UserModule {}
+export class UserModule { }
