@@ -47,6 +47,9 @@ import { UpdateProjectDTO } from '@src/planner/DTOs/updateProject.dto';
 import { ProjectService } from '@src/planner/services/project.service';
 import { LoggerService } from '@src/shared/services/logger.service';
 
+/* Utils */
+import { transformQueryToSearch, SearchQueryParams } from '@src/shared/utils/search.util';
+
 /**
  * ProjectController class handling HTTP requests for project management
  * 
@@ -236,12 +239,78 @@ export class ProjectController {
    *     "pages": 3
    *   }
    * }
+   * ```  
+   * 
+   * Get all projects with advanced search and filtering options
+   * 
+   * Supports comprehensive querying with pagination, sorting, text search,
+   * filtering, and advanced options like date ranges and field selection.
+   * 
+   * @route GET /project
+   * @param {SearchQueryParams} query - Search and filter parameters
+   * @returns {Promise<TRepositoryResponse<TProject[]>>} Array of projects with metadata
+   * 
+   * @example
+   * ```http
+   * Basic usage:
+   * GET /project
+   * 
+   * With pagination:
+   * GET /project?page=1&limit=10
+   * 
+   * With sorting:
+   * GET /project?sort=name:asc,createdAt:desc
+   * 
+   * With text search:
+   * GET /project?search=e-commerce&searchFields=name,description
+   * 
+   * With filters:
+   * GET /project?status=active&categoryId=64a7b8c9d2e3f4a5b6c7d8e9
+   * 
+   * With date range:
+   * GET /project?dateFrom=2024-01-01&dateTo=2024-12-31&dateField=startDate
+   * 
+   * Complex query:
+   * GET /project?search=website&page=1&limit=20&sort=priority:desc&status=active&categoryId=64a7b8c9d2e3f4a5b6c7d8e9&dateFrom=2024-01-01&select=id,name,status,priority
+   * 
+   * Available query parameters:
+   * - page: Page number (default: 1)
+   * - limit: Items per page (default: 10, max: 100)
+   * - sort: Sort fields (format: field:order, e.g., "name:asc,createdAt:desc")
+   * - search: Text search query
+   * - searchFields: Comma-separated fields to search in (e.g., "name,description")
+   * - caseSensitive: Case-sensitive search (true/false)
+   * - useRegex: Use regex search (true/false)
+   * - dateFrom/dateTo: Date range filter (ISO date strings)
+   * - dateField: Field to apply date range to (default: createdAt)
+   * - select: Comma-separated fields to return
+   * - populate: Comma-separated fields to populate
+   * - includeDeleted: Include soft-deleted items (true/false)
+   * - status: Filter by project status
+   * - categoryId: Filter by category ID
+   * - subCategoryId: Filter by subcategory ID
+   * - priority: Filter by priority level
+   * - isActive: Filter by active status (true/false)
+   * - ownerId: Filter by owner/creator ID
+   * - Any other parameter will be treated as a direct filter
    * ```
    */
   @Get('')
-  async readAll(@Query() query?: any) {
-    const args: TSearch<TProject> = query || undefined;
-    return await this._projectService.readAll(args);
+  async readAll(@Query() query: SearchQueryParams) {
+    this._loggerService.info('ProjectController.readAll', 'ProjectController');
+    
+    // Define allowed filter fields for security
+    const allowedFilterFields = [
+      'status', 'categoryId', 'subCategoryId', 'priority', 'isActive', 
+      'ownerId', 'assignedTo', 'tags', 'budget', 'progress'
+    ];
+    
+    const searchArgs: TSearch<TProject> = transformQueryToSearch<TProject>(
+      query, 
+      allowedFilterFields
+    );
+    
+    return await this._projectService.readAll(searchArgs);
   }
 
   /**

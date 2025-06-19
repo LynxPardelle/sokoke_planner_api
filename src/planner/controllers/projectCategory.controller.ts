@@ -17,6 +17,8 @@ import { UpdateProjectCategoryDTO } from '@src/planner/DTOs/updateProjectCategor
 /* Services */
 import { ProjectCategoryService } from '@src/planner/services/projectCategory.service';
 import { LoggerService } from '@src/shared/services/logger.service';
+/* Utils */
+import { transformQueryToSearch, SearchQueryParams } from '@src/shared/utils/search.util';
 @Controller('project-category')
 export class ProjectCategoryController {
   constructor(
@@ -39,12 +41,39 @@ export class ProjectCategoryController {
   async read(@Param('id') id: string) {
     if (!id) throw new Error('Id is required');
     return await this._projectCategoryService.read(id);
-  }
+  }  
+  /**
+   * Get all project categories with advanced search and filtering options
+   * 
+   * @route GET /project-category
+   * @param {SearchQueryParams} query - Search and filter parameters
+   * @returns {Promise<TRepositoryResponse<TProjectCategory[]>>} Array of categories with metadata
+   * 
+   * Available query parameters:
+   * - page: Page number (default: 1)
+   * - limit: Items per page (default: 10, max: 100)
+   * - sort: Sort fields (e.g., "name:asc,order:asc")
+   * - search: Text search query
+   * - searchFields: Fields to search in (e.g., "name,description")
+   * - isActive: Filter by active status (true/false)
+   * - parentId: Filter by parent category ID
+   */
   @Get('')
-  async readAll() {
-    const args: TSearch<TProjectCategory> = undefined;
-    return await this._projectCategoryService.readAll(args);
-  }  @Put('')
+  async readAll(@Query() query: SearchQueryParams) {
+    this._loggerService.info('ProjectCategoryController.readAll', 'ProjectCategoryController');
+    
+    const allowedFilterFields = [
+      'isActive', 'parentId', 'order', 'color', 'icon'
+    ];
+    
+    const searchArgs: TSearch<TProjectCategory> = transformQueryToSearch<TProjectCategory>(
+      query, 
+      allowedFilterFields
+    );
+    
+    return await this._projectCategoryService.readAll(searchArgs);
+  }
+  @Put('')
   async update(@Body() data: UpdateProjectCategoryDTO) {
     return await this._projectCategoryService.update(data);
   }

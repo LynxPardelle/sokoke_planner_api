@@ -18,6 +18,8 @@ import { UpdateStatusDTO } from '@src/planner/DTOs/updateStatus.dto';
 /* Services */
 import { StatusService } from '@src/planner/services/status.service';
 import { LoggerService } from '@src/shared/services/logger.service';
+/* Utils */
+import { transformQueryToSearch, SearchQueryParams } from '@src/shared/utils/search.util';
 @Controller('status')
 export class StatusController {
   constructor(
@@ -53,11 +55,39 @@ export class StatusController {
   async read(@Param('id') id: string) {
     if (!id) throw new Error('Id is required');
     return await this._statusService.read(id);
-  }
+  }  
+  /**
+   * Get all statuses with advanced search and filtering options
+   * 
+   * @route GET /status
+   * @param {SearchQueryParams} query - Search and filter parameters
+   * @returns {Promise<TRepositoryResponse<TStatus[]>>} Array of statuses with metadata
+   * 
+   * Available query parameters:
+   * - page: Page number (default: 1)
+   * - limit: Items per page (default: 10, max: 100)
+   * - sort: Sort fields (e.g., "name:asc,order:asc")
+   * - search: Text search query
+   * - searchFields: Fields to search in (e.g., "name,description")
+   * - parentId: Filter by parent ID
+   * - parentType: Filter by parent type (project, feature, task)
+   * - isActive: Filter by active status (true/false)
+   * - isDefault: Filter by default status (true/false)
+   */
   @Get('')
-  async readAll() {
-    const args: TSearch<TStatus> = undefined;
-    return await this._statusService.readAll(args);
+  async readAll(@Query() query: SearchQueryParams) {
+    this._loggerService.info('StatusController.readAll', 'StatusController');
+    
+    const allowedFilterFields = [
+      'parentId', 'parentType', 'isActive', 'isDefault', 'order', 'color'
+    ];
+    
+    const searchArgs: TSearch<TStatus> = transformQueryToSearch<TStatus>(
+      query, 
+      allowedFilterFields
+    );
+    
+    return await this._statusService.readAll(searchArgs);
   }
   @Put('')
   @Validate(UpdateStatusDTO)
