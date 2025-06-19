@@ -1,13 +1,28 @@
+#!/bin/bash
+
+# Script to fix all planner service tests
+
+services=(
+  "projectSubCategory"
+  "feature"  
+  "requeriment"
+  "status"
+  "task"
+)
+
+for service in "${services[@]}"; do
+  echo "Fixing ${service}.service.spec.ts"
+  
+  cat > "src/planner/services/${service}.service.spec.ts" << EOF
 import { Test, TestingModule } from '@nestjs/testing';
-import { FeatureService } from './feature.service';
-import FeatureRepository from '../repositories/feature.repository';
+import { ${service^}Service } from './${service}.service';
+import ${service^}Repository from '../repositories/${service}.repository';
 import { LoggerService } from '@src/shared/services/logger.service';
-import { ProjectService } from './project.service';
 
-describe('FeatureService', () => {
-  let service: FeatureService;
+describe('${service^}Service', () => {
+  let service: ${service^}Service;
 
-  const mockFeatureRepository = {
+  const mock${service^}Repository = {
     create: jest.fn(),
     readAll: jest.fn(),
     read: jest.fn(),
@@ -24,35 +39,22 @@ describe('FeatureService', () => {
     fatal: jest.fn(),
   };
 
-  const mockProjectService = {
-    create: jest.fn(),
-    readAll: jest.fn(),
-    read: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-    author: jest.fn(),
-  };
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        FeatureService,
+        ${service^}Service,
         {
-          provide: FeatureRepository,
-          useValue: mockFeatureRepository,
+          provide: ${service^}Repository,
+          useValue: mock${service^}Repository,
         },
         {
           provide: LoggerService,
           useValue: mockLoggerService,
         },
-        {
-          provide: ProjectService,
-          useValue: mockProjectService,
-        },
       ],
     }).compile();
 
-    service = module.get<FeatureService>(FeatureService);
+    service = module.get<${service^}Service>(${service^}Service);
   });
 
   afterEach(() => {
@@ -74,3 +76,8 @@ describe('FeatureService', () => {
     });
   });
 });
+EOF
+
+done
+
+echo "All service tests fixed!"
