@@ -1,4 +1,4 @@
-export interface AuthResponse {
+export type TAuthResponse = {
   success: boolean;
   message: string;
   data?: {
@@ -13,9 +13,9 @@ export interface AuthResponse {
     };
     expiresIn: number;
   };
-}
+};
 
-export interface TokenValidationResponse {
+export type TTokenValidationResponse = {
   valid: boolean;
   user?: {
     id: string;
@@ -25,23 +25,23 @@ export interface TokenValidationResponse {
     verified: boolean;
   };
   error?: string;
-}
+};
 
-export interface RefreshTokenResponse {
+export type TRefreshTokenResponse = {
   success: boolean;
   accessToken?: string;
   refreshToken?: string;
   expiresIn?: number;
   error?: string;
-}
+};
 
-export interface PasswordResetResponse {
+export type TPasswordResetResponse = {
   success: boolean;
   message: string;
   resetTokenExpiration?: string;
-}
+};
 
-export interface EmailVerificationResponse {
+export type TEmailVerificationResponse = {
   success: boolean;
   message: string;
   user?: {
@@ -49,9 +49,9 @@ export interface EmailVerificationResponse {
     email: string;
     verified: boolean;
   };
-}
+};
 
-export interface LogoutResponse {
+export type TLogoutResponse = {
   success: boolean;
   message: string;
-}
+};

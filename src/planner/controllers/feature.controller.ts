@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 /* Types */
 import { TFeature } from '@src/planner/types/feature.type';
-import { TSearch } from '@src/shared/types/search.type';
+import { TSearch, TSearchQueryParams } from '@src/shared/types/search.type';
 /* DTOs */
 import { CreateFeatureDTO } from '@src/planner/DTOs/createFeature.dto';
 import { UpdateFeatureDTO } from '@src/planner/DTOs/updateFeature.dto';
@@ -19,7 +19,7 @@ import { UpdateFeatureDTO } from '@src/planner/DTOs/updateFeature.dto';
 import { FeatureService } from '@src/planner/services/feature.service';
 import { LoggerService } from '@src/shared/services/logger.service';
 /* Utils */
-import { transformQueryToSearch, SearchQueryParams } from '@src/shared/utils/search.util';
+import { transformQueryToSearch } from '@src/shared/utils/search.util';
 @Controller('feature')
 export class FeatureController {
   constructor(
@@ -56,7 +56,7 @@ export class FeatureController {
    * filtering, and advanced options like date ranges and field selection.
    * 
    * @route GET /feature
-   * @param {SearchQueryParams} query - Search and filter parameters
+   * @param {TSearchQueryParams} query - Search and filter parameters
    * @returns {Promise<TRepositoryResponse<TFeature[]>>} Array of features with metadata
    * 
    * @example
@@ -99,7 +99,7 @@ export class FeatureController {
    * ```
    */
   @Get('')
-  async readAll(@Query() query: SearchQueryParams) {
+  async readAll(@Query() query: TSearchQueryParams) {
     this._loggerService.info('FeatureController.readAll', 'FeatureController');
     
     // Define allowed filter fields for security

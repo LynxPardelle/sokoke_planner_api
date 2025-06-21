@@ -95,3 +95,40 @@ export type TSearchResult<T> = {
         searchTime?: number;
     };
 };
+
+/**
+ * Query parameter type for search operations
+ * Represents the structure of query parameters that can be sent via HTTP
+ */
+export type TSearchQueryParams = {
+  // Pagination parameters
+  page?: string | number;
+  limit?: string | number;
+  
+  // Sorting parameters
+  sort?: string; // Format: "field:order,field2:order" (e.g., "name:asc,createdAt:desc")
+  
+  // Text search parameters
+  search?: string; // Search query string
+  searchFields?: string; // Comma-separated fields to search in
+  caseSensitive?: string | boolean;
+  useRegex?: string | boolean;
+  fuzzyTolerance?: string | number;
+  
+  // Date range filters
+  dateFrom?: string; // ISO date string
+  dateTo?: string; // ISO date string
+  dateField?: string; // Field to apply date range to
+  
+  // Numeric range filters
+  numMin?: string | number;
+  numMax?: string | number;
+  numField?: string; // Field to apply numeric range to
+  
+  // Advanced options
+  includeDeleted?: string | boolean;
+  select?: string; // Comma-separated fields to select
+  populate?: string; // Comma-separated fields to populate
+    // Generic filters (any other query parameters will be treated as filters)
+  [key: string]: any;
+};

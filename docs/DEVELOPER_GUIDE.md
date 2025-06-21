@@ -228,30 +228,214 @@ export class ExampleService {
 }
 ```
 
-#### 3. Interface Documentation
+#### 3. Types vs Interfaces
+
+**Prefer Types Over Interfaces**
+
+In this project, we use types as the primary mechanism for defining data structures. Here's why types are preferred:
+
+**Advantages of Types:**
+
+1. **Union and Intersection Support**
+
+   ```typescript
+   // Types handle complex unions naturally
+   type TStatus = 'active' | 'inactive' | 'pending';
+   type TProjectWithStatus = TProject & { status: TStatus };
+   
+   // More flexible composition
+   type TApiResponse<T> = TSuccessResponse<T> | TErrorResponse;
+   ```
+
+2. **Better Computed Properties**
+
+   ```typescript
+   // Types excel at computed and mapped types
+   type TProjectKeys = keyof TProject;
+   type TOptionalProject = Partial<TProject>;
+   type TProjectUpdate = Pick<TProject, 'name' | 'description'> & { _id: string };
+   ```
+
+3. **Template Literal Types**
+
+   ```typescript
+   // Advanced string manipulation
+   type THttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+   type TApiEndpoint = `/${string}`;
+   type TApiRoute = `${THttpMethod} ${TApiEndpoint}`;
+   ```
+
+4. **Immutability and Readonly**
+
+   ```typescript
+   // Better readonly support
+   type TReadonlyProject = Readonly<TProject>;
+   type TDeepReadonly<T> = {
+     readonly [P in keyof T]: TDeepReadonly<T[P]>;
+   };
+   ```
+
+5. **Conditional Types**
+
+   ```typescript
+   // Advanced conditional logic
+   type TApiResult<T> = T extends string 
+     ? TStringResult 
+     : T extends number 
+     ? TNumberResult 
+     : TGenericResult<T>;
+   ```
+
+**Type Definition Pattern:**
 
 ```typescript
 /**
- * Interface description
+ * Project entity type
  * 
- * @interface
+ * Represents a project in the system with all its properties
+ * and relationships to other entities.
  */
-export interface IExample {
-  /** Property description */
+export type TProject = {
+  /** Unique identifier */
+  _id: string;
+  
+  /** Project name (required) */
+  name: string;
+  
+  /** Project description (optional) */
+  description?: string;
+  
+  /** Associated category */
+  category: TProjectCategory | string;
+  
+  /** Project status */
+  status: TStatus | string;
+  
+  /** Creation timestamp */
+  createdAt: Date;
+  
+  /** Last update timestamp */
+  updatedAt: Date;
+};
+
+/** Type for creating new projects (excludes _id) */
+export type TProjectCreateDTO = Partial<Omit<TProject, '_id'>>;
+
+/** Type for updating projects (requires _id) */
+export type TProjectUpdateDTO = TProjectCreateDTO & Required<{ _id: string }>;
+```
+
+**When to Use Interfaces (Extreme Cases Only):**
+
+Interfaces should only be used in these specific scenarios:
+
+1. **Declaration Merging Requirements**
+
+   ```typescript
+   // When you need to extend external library types
+   declare global {
+     namespace Express {
+       interface Request {
+         user?: TUser;
+       }
+     }
+   }
+   
+   // Or when building extensible plugin systems
+   interface IPluginSystem {
+     register(plugin: TPlugin): void;
+   }
+   
+   // Later, other modules can extend this
+   interface IPluginSystem {
+     unregister(pluginId: string): void;
+   }
+   ```
+
+2. **Class Implementation Contracts**
+
+   ```typescript
+   // When defining strict contracts for classes
+   interface IRepository<T> {
+     create(data: T): Promise<T>;
+     read(id: string): Promise<T>;
+     update(id: string, data: Partial<T>): Promise<T>;
+     delete(id: string): Promise<void>;
+   }
+   
+   // Multiple classes can implement this contract
+   class MongoRepository<T> implements IRepository<T> {
+     // Implementation
+   }
+   
+   class SqlRepository<T> implements IRepository<T> {
+     // Implementation
+   }
+   ```
+
+3. **External API Contracts**
+
+   ```typescript
+   // When defining contracts for external consumption
+   interface IPublicAPI {
+     version: string;
+     authenticate(credentials: TCredentials): Promise<TAuthResult>;
+     getData(query: TQuery): Promise<TApiResponse>;
+   }
+   ```
+
+**Migration from Interface to Type:**
+
+When converting existing interfaces to types:
+
+```typescript
+// OLD (Interface)
+interface IProject {
   id: string;
-  
-  /** Optional property description */
-  name?: string;
-  
-  /**
-   * Method description
-   * 
-   * @param {string} param - Parameter description
-   * @returns {Promise<boolean>} Return description
-   */
-  methodName(param: string): Promise<boolean>;
+  name: string;
+}
+
+// NEW (Type)
+export type TProject = {
+  _id: string;  // Use _id for MongoDB compatibility
+  name: string;
+};
+
+// Update all related types
+export type TProjectCreateDTO = Partial<Omit<TProject, '_id'>>;
+export type TProjectUpdateDTO = TProjectCreateDTO & Required<{ _id: string }>;
+```
+
+**Best Practices:**
+
+1. **Always prefer types for data structures**
+2. **Use the `T` prefix for all type definitions**
+3. **Create DTO types using utility types (Partial, Omit, Pick)**
+4. **Export types from dedicated `.type.ts` files**
+5. **Use interfaces only for the three extreme cases mentioned above**
+6. **Document the reason when using interfaces instead of types**
+
+```typescript
+// Good: Type-based approach
+export type TUserPreferences = {
+  theme: 'light' | 'dark';
+  language: string;
+  notifications: boolean;
+};
+
+export type TUserWithPreferences = TUser & {
+  preferences: TUserPreferences;
+};
+
+// Avoid: Interface-based approach (unless extreme case)
+interface IUserPreferences {
+  theme: 'light' | 'dark';
+  language: string;
+  notifications: boolean;
 }
 ```
+
+This approach ensures consistency, leverages TypeScript's advanced type features, and maintains better type safety throughout the application.
 
 ### Error Handling
 
@@ -500,13 +684,13 @@ export class MongoDBProjectDAO {
 
 ### Enhanced Search Implementation
 
-The API features a comprehensive search system that provides powerful querying capabilities across all entities. The search implementation is built around the `TSearch<T>` interface and `SearchService` utility.
+The API features a comprehensive search system that provides powerful querying capabilities across all entities. The search implementation is built around the `TSearch<T>` type and `SearchService` utility.
 
 #### Search Architecture
 
 ```typescript
 /**
- * Search interface supporting filtering, pagination, sorting, and text search
+ * Search type supporting filtering, pagination, sorting, and text search
  */
 type TSearch<T> = {
     filters?: Partial<T>;           // Entity property filters

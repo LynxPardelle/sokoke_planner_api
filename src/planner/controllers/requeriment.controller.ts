@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 /* Types */
 import { TRequeriment } from '@src/planner/types/requeriment.type';
-import { TSearch } from '@src/shared/types/search.type';
+import { TSearch, TSearchQueryParams } from '@src/shared/types/search.type';
 /* DTOs */
 import { CreateRequerimentDTO } from '@src/planner/DTOs/createRequeriment.dto';
 import { UpdateRequerimentDTO } from '@src/planner/DTOs/updateRequeriment.dto';
@@ -19,7 +19,7 @@ import { UpdateRequerimentDTO } from '@src/planner/DTOs/updateRequeriment.dto';
 import { RequerimentService } from '@src/planner/services/requeriment.service';
 import { LoggerService } from '@src/shared/services/logger.service';
 /* Utils */
-import { transformQueryToSearch, SearchQueryParams } from '@src/shared/utils/search.util';
+import { transformQueryToSearch } from '@src/shared/utils/search.util';
 @Controller('requeriment')
 export class RequerimentController {
   constructor(
@@ -56,7 +56,7 @@ export class RequerimentController {
    * Get all requirements with advanced search and filtering options
    * 
    * @route GET /requeriment
-   * @param {SearchQueryParams} query - Search and filter parameters
+   * @param {TSearchQueryParams} query - Search and filter parameters
    * @returns {Promise<TRepositoryResponse<TRequeriment[]>>} Array of requirements with metadata
    * 
    * Available query parameters:
@@ -72,7 +72,7 @@ export class RequerimentController {
    * - isActive: Filter by active status (true/false)
    */
   @Get('')
-  async readAll(@Query() query: SearchQueryParams) {
+  async readAll(@Query() query: TSearchQueryParams) {
     this._loggerService.info('RequerimentController.readAll', 'RequerimentController');
     
     const allowedFilterFields = [

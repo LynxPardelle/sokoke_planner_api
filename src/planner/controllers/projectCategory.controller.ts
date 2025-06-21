@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 /* Types */
 import { TProjectCategory } from '@src/planner/types/projectCategory.type';
-import { TSearch } from '@src/shared/types/search.type';
+import { TSearch, TSearchQueryParams } from '@src/shared/types/search.type';
 /* DTOs */
 import { CreateProjectCategoryDTO } from '@src/planner/DTOs/createProjectCategory.dto';
 import { UpdateProjectCategoryDTO } from '@src/planner/DTOs/updateProjectCategory.dto';
@@ -18,7 +18,7 @@ import { UpdateProjectCategoryDTO } from '@src/planner/DTOs/updateProjectCategor
 import { ProjectCategoryService } from '@src/planner/services/projectCategory.service';
 import { LoggerService } from '@src/shared/services/logger.service';
 /* Utils */
-import { transformQueryToSearch, SearchQueryParams } from '@src/shared/utils/search.util';
+import { transformQueryToSearch } from '@src/shared/utils/search.util';
 @Controller('project-category')
 export class ProjectCategoryController {
   constructor(
@@ -46,7 +46,7 @@ export class ProjectCategoryController {
    * Get all project categories with advanced search and filtering options
    * 
    * @route GET /project-category
-   * @param {SearchQueryParams} query - Search and filter parameters
+   * @param {TSearchQueryParams} query - Search and filter parameters
    * @returns {Promise<TRepositoryResponse<TProjectCategory[]>>} Array of categories with metadata
    * 
    * Available query parameters:
@@ -59,7 +59,7 @@ export class ProjectCategoryController {
    * - parentId: Filter by parent category ID
    */
   @Get('')
-  async readAll(@Query() query: SearchQueryParams) {
+  async readAll(@Query() query: TSearchQueryParams) {
     this._loggerService.info('ProjectCategoryController.readAll', 'ProjectCategoryController');
     
     const allowedFilterFields = [

@@ -3,33 +3,12 @@ import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import * as handlebars from 'handlebars';
 import { LoggerService } from './logger.service';
-
-export interface EmailOptions {
-  to: string | string[];
-  cc?: string | string[];
-  bcc?: string | string[];
-  subject?: string;
-  template?: string;
-  context?: Record<string, any>;
-  text?: string;
-  html?: string;
-  attachments?: Array<{
-    filename: string;
-    content: Buffer | string;
-    contentType?: string;
-  }>;
-}
-
-export interface EmailTemplate {
-  subject: string;
-  html: string;
-  text?: string;
-}
+import { TEmailOptions, TEmailTemplate } from '../types/email.type';
 
 @Injectable()
 export class EmailService {
   private transporter: nodemailer.Transporter;
-  private templates: Map<string, EmailTemplate> = new Map();
+  private templates: Map<string, TEmailTemplate> = new Map();
 
   constructor(
     private readonly _configService: ConfigService,
@@ -337,7 +316,7 @@ export class EmailService {
 
     this._loggerService.info('Email templates loaded successfully', 'EmailService');
   }
-  async sendEmail(options: EmailOptions): Promise<boolean> {
+  async sendEmail(options: TEmailOptions): Promise<boolean> {
     try {
       let { subject, html, text } = options;
 

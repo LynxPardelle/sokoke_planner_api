@@ -15,12 +15,12 @@ import {
   ChangePasswordDTO,
   RefreshTokenDTO 
 } from '../DTOs/auth.dto';
-import { 
-  AuthResponse, 
-  TokenValidationResponse,
-  RefreshTokenResponse,
-  PasswordResetResponse,
-  EmailVerificationResponse 
+import {
+  TAuthResponse, 
+  TTokenValidationResponse,
+  TRefreshTokenResponse,
+  TPasswordResetResponse,
+  TEmailVerificationResponse 
 } from '../types/auth-response.type';
 import { CreateUserDTO } from '@src/user/DTOs/createUser.dto';
 import { UpdateUserDTO } from '@src/user/DTOs/updateUser.dto';
@@ -52,7 +52,7 @@ export class AuthService {
   /**
    * Register a new user
    */
-  async register(registerData: RegisterDTO): Promise<AuthResponse> {
+  async register(registerData: RegisterDTO): Promise<TAuthResponse> {
     try {
       this._loggerService.info('AuthService.register', 'AuthService');
       
@@ -135,7 +135,7 @@ export class AuthService {
   /**
    * Login user
    */
-  async login(loginData: LoginDTO, userAgent?: string, ipAddress?: string): Promise<AuthResponse> {
+  async login(loginData: LoginDTO, userAgent?: string, ipAddress?: string): Promise<TAuthResponse> {
     try {
       this._loggerService.info('AuthService.login', 'AuthService');
 
@@ -196,7 +196,7 @@ export class AuthService {
   /**
    * Validate JWT token
    */
-  async validateToken(token: string): Promise<TokenValidationResponse> {
+  async validateToken(token: string): Promise<TTokenValidationResponse> {
     try {
       const payload = this._jwtService.verify(token, { secret: this.jwtSecret });
       
@@ -225,7 +225,7 @@ export class AuthService {
   /**
    * Refresh access token
    */
-  async refreshToken(refreshTokenData: RefreshTokenDTO): Promise<RefreshTokenResponse> {
+  async refreshToken(refreshTokenData: RefreshTokenDTO): Promise<TRefreshTokenResponse> {
     try {
       const storedToken = this.refreshTokenStore.get(refreshTokenData.refreshToken);
       
@@ -267,7 +267,7 @@ export class AuthService {
   /**
    * Forgot password
    */  
-  async forgotPassword(forgotPasswordData: ForgotPasswordDTO): Promise<PasswordResetResponse> {
+  async forgotPassword(forgotPasswordData: ForgotPasswordDTO): Promise<TPasswordResetResponse> {
     try {
       this._loggerService.info('AuthService.forgotPassword', 'AuthService');
 
@@ -330,7 +330,7 @@ export class AuthService {
   /**
    * Reset password
    */
-  async resetPassword(resetPasswordData: ResetPasswordDTO, userAgent?: string, ipAddress?: string): Promise<PasswordResetResponse> {
+  async resetPassword(resetPasswordData: ResetPasswordDTO, userAgent?: string, ipAddress?: string): Promise<TPasswordResetResponse> {
     try {
       this._loggerService.info('AuthService.resetPassword', 'AuthService');
 
@@ -398,7 +398,7 @@ export class AuthService {
   /**
    * Verify email
    */
-  async verifyEmail(verifyEmailData: VerifyEmailDTO): Promise<EmailVerificationResponse> {
+  async verifyEmail(verifyEmailData: VerifyEmailDTO): Promise<TEmailVerificationResponse> {
     try {
       this._loggerService.info('AuthService.verifyEmail', 'AuthService');
 
@@ -419,7 +419,7 @@ export class AuthService {
 
   /**
    * Change password (for authenticated users)
-   */  async changePassword(userId: string, changePasswordData: ChangePasswordDTO, userAgent?: string, ipAddress?: string): Promise<PasswordResetResponse> {
+   */  async changePassword(userId: string, changePasswordData: ChangePasswordDTO, userAgent?: string, ipAddress?: string): Promise<TPasswordResetResponse> {
     try {
       this._loggerService.info('AuthService.changePassword', 'AuthService');
 

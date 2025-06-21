@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 /* Types */
 import { TProjectSubCategory } from '@src/planner/types/projectSubCategory.type';
-import { TSearch } from '@src/shared/types/search.type';
+import { TSearch, TSearchQueryParams } from '@src/shared/types/search.type';
 /* DTOs */
 import { CreateProjectSubCategoryDTO } from '@src/planner/DTOs/createProjectSubCategory.dto';
 import { UpdateProjectSubCategoryDTO } from '@src/planner/DTOs/updateProjectSubCategory.dto';
@@ -18,7 +18,7 @@ import { UpdateProjectSubCategoryDTO } from '@src/planner/DTOs/updateProjectSubC
 import { ProjectSubCategoryService } from '@src/planner/services/projectSubCategory.service';
 import { LoggerService } from '@src/shared/services/logger.service';
 /* Utils */
-import { transformQueryToSearch, SearchQueryParams } from '@src/shared/utils/search.util';
+import { transformQueryToSearch } from '@src/shared/utils/search.util';
 @Controller('project-sub-category')
 export class ProjectSubCategoryController {
   constructor(
@@ -54,7 +54,7 @@ export class ProjectSubCategoryController {
    * Get all project subcategories with advanced search and filtering options
    * 
    * @route GET /project-sub-category
-   * @param {SearchQueryParams} query - Search and filter parameters
+   * @param {TSearchQueryParams} query - Search and filter parameters
    * @returns {Promise<TRepositoryResponse<TProjectSubCategory[]>>} Array of subcategories with metadata
    * 
    * Available query parameters:
@@ -67,7 +67,7 @@ export class ProjectSubCategoryController {
    * - isActive: Filter by active status (true/false)
    */
   @Get('')
-  async readAll(@Query() query: SearchQueryParams) {
+  async readAll(@Query() query: TSearchQueryParams) {
     this._loggerService.info('ProjectSubCategoryController.readAll', 'ProjectSubCategoryController');
 
     const allowedFilterFields = [

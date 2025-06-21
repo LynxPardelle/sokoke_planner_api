@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 /* Types */
 import { TStatus, TStatusParentType } from '@src/planner/types/status.type';
-import { TSearch } from '@src/shared/types/search.type';
+import { TSearch, TSearchQueryParams } from '@src/shared/types/search.type';
 /* DTOs */
 import { CreateStatusDTO } from '@src/planner/DTOs/createStatus.dto';
 import { UpdateStatusDTO } from '@src/planner/DTOs/updateStatus.dto';
@@ -19,7 +19,7 @@ import { UpdateStatusDTO } from '@src/planner/DTOs/updateStatus.dto';
 import { StatusService } from '@src/planner/services/status.service';
 import { LoggerService } from '@src/shared/services/logger.service';
 /* Utils */
-import { transformQueryToSearch, SearchQueryParams } from '@src/shared/utils/search.util';
+import { transformQueryToSearch } from '@src/shared/utils/search.util';
 @Controller('status')
 export class StatusController {
   constructor(
@@ -60,7 +60,7 @@ export class StatusController {
    * Get all statuses with advanced search and filtering options
    * 
    * @route GET /status
-   * @param {SearchQueryParams} query - Search and filter parameters
+   * @param {TSearchQueryParams} query - Search and filter parameters
    * @returns {Promise<TRepositoryResponse<TStatus[]>>} Array of statuses with metadata
    * 
    * Available query parameters:
@@ -75,7 +75,7 @@ export class StatusController {
    * - isDefault: Filter by default status (true/false)
    */
   @Get('')
-  async readAll(@Query() query: SearchQueryParams) {
+  async readAll(@Query() query: TSearchQueryParams) {
     this._loggerService.info('StatusController.readAll', 'StatusController');
     
     const allowedFilterFields = [

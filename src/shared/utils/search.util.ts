@@ -10,45 +10,7 @@
  * @since 2025-06-19
  */
 
-import { TSearch } from '@src/shared/types/search.type';
-
-/**
- * Query parameter interface for search operations
- * Represents the structure of query parameters that can be sent via HTTP
- */
-export interface SearchQueryParams {
-  // Pagination parameters
-  page?: string | number;
-  limit?: string | number;
-  
-  // Sorting parameters
-  sort?: string; // Format: "field:order,field2:order" (e.g., "name:asc,createdAt:desc")
-  
-  // Text search parameters
-  search?: string; // Search query string
-  searchFields?: string; // Comma-separated fields to search in
-  caseSensitive?: string | boolean;
-  useRegex?: string | boolean;
-  fuzzyTolerance?: string | number;
-  
-  // Date range filters
-  dateFrom?: string; // ISO date string
-  dateTo?: string; // ISO date string
-  dateField?: string; // Field to apply date range to
-  
-  // Numeric range filters
-  numMin?: string | number;
-  numMax?: string | number;
-  numField?: string; // Field to apply numeric range to
-  
-  // Advanced options
-  includeDeleted?: string | boolean;
-  select?: string; // Comma-separated fields to select
-  populate?: string; // Comma-separated fields to populate
-  
-  // Generic filters (any other query parameters will be treated as filters)
-  [key: string]: any;
-}
+import { TSearch, TSearchQueryParams } from '@src/shared/types/search.type';
 
 /**
  * Transform HTTP query parameters into a TSearch object
@@ -58,7 +20,7 @@ export interface SearchQueryParams {
  * @returns TSearch object or undefined if no search parameters
  */
 export function transformQueryToSearch<T>(
-  queryParams: SearchQueryParams,
+  queryParams: TSearchQueryParams,
   allowedFilterFields?: string[]
 ): TSearch<T> {
   if (!queryParams || Object.keys(queryParams).length === 0) {
@@ -233,3 +195,4 @@ export function getSearchExamples(): { [key: string]: string } {
     'Full featured': '?search=project&searchFields=name,description&page=2&limit=25&sort=createdAt:desc&status=active&dateFrom=2024-01-01&dateTo=2024-12-31&select=id,name,status,createdAt'
   };
 }
+

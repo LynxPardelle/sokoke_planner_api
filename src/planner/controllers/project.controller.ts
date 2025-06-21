@@ -37,7 +37,7 @@ import {
 
 /* Type definitions */
 import { TProject } from '@src/planner/types/project.type';
-import { TSearch } from '@src/shared/types/search.type';
+import { TSearch, TSearchQueryParams } from '@src/shared/types/search.type';
 
 /* Data Transfer Objects for validation */
 import { CreateProjectDTO } from '@src/planner/DTOs/createProject.dto';
@@ -48,7 +48,7 @@ import { ProjectService } from '@src/planner/services/project.service';
 import { LoggerService } from '@src/shared/services/logger.service';
 
 /* Utils */
-import { transformQueryToSearch, SearchQueryParams } from '@src/shared/utils/search.util';
+import { transformQueryToSearch } from '@src/shared/utils/search.util';
 
 /**
  * ProjectController class handling HTTP requests for project management
@@ -247,7 +247,7 @@ export class ProjectController {
    * filtering, and advanced options like date ranges and field selection.
    * 
    * @route GET /project
-   * @param {SearchQueryParams} query - Search and filter parameters
+   * @param {TSearchQueryParams} query - Search and filter parameters
    * @returns {Promise<TRepositoryResponse<TProject[]>>} Array of projects with metadata
    * 
    * @example
@@ -296,7 +296,7 @@ export class ProjectController {
    * ```
    */
   @Get('')
-  async readAll(@Query() query: SearchQueryParams) {
+  async readAll(@Query() query: TSearchQueryParams) {
     this._loggerService.info('ProjectController.readAll', 'ProjectController');
     
     // Define allowed filter fields for security

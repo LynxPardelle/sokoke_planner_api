@@ -23,14 +23,21 @@ import {
   RefreshTokenDTO,
 } from '../DTOs/auth.dto';
 import {
-  AuthResponse,
-  TokenValidationResponse,
-  RefreshTokenResponse,
-  PasswordResetResponse,
-  EmailVerificationResponse,
-  LogoutResponse,
+  TAuthResponse,
+  TTokenValidationResponse,
+  TRefreshTokenResponse,
+  TPasswordResetResponse,
+  TEmailVerificationResponse,
+  TLogoutResponse,
 } from '../types/auth-response.type';
 
+/**
+ * AuthenticatedRequest interface - JUSTIFIED INTERFACE USAGE
+ * 
+ * This is one of the extreme cases where an interface is appropriate
+ * because we need to extend an external library type (Express Request).
+ * TypeScript requires interfaces for this kind of declaration merging.
+ */
 interface AuthenticatedRequest extends Request {
   user: {
     id: string;
@@ -51,12 +58,11 @@ export class AuthController {
    * POST /auth/register
    */
   @Post('register')
-  @HttpCode(HttpStatus.CREATED)
-  async register(
+  @HttpCode(HttpStatus.CREATED)  async register(
     @Body() registerData: RegisterDTO,
     @Headers('user-agent') userAgent: string,
     @Ip() ipAddress: string,
-  ): Promise<AuthResponse> {
+  ): Promise<TAuthResponse> {
     try {
       this._loggerService.info('AuthController.register', 'AuthController');
       return await this._authService.register(registerData);
@@ -76,7 +82,7 @@ export class AuthController {
     @Body() loginData: LoginDTO,
     @Headers('user-agent') userAgent: string,
     @Ip() ipAddress: string,
-  ): Promise<AuthResponse> {
+  ): Promise<TAuthResponse> {
     try {
       this._loggerService.info('AuthController.login', 'AuthController');
       return await this._authService.login(loginData, userAgent, ipAddress);
@@ -92,7 +98,7 @@ export class AuthController {
    */
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  async refreshToken(@Body() refreshTokenData: RefreshTokenDTO): Promise<RefreshTokenResponse> {
+  async refreshToken(@Body() refreshTokenData: RefreshTokenDTO): Promise<TRefreshTokenResponse> {
     try {
       this._loggerService.info('AuthController.refreshToken', 'AuthController');
       return await this._authService.refreshToken(refreshTokenData);
@@ -108,7 +114,7 @@ export class AuthController {
    */
   @Post('validate')
   @HttpCode(HttpStatus.OK)
-  async validateToken(@Body() tokenData: { token: string }): Promise<TokenValidationResponse> {
+  async validateToken(@Body() tokenData: { token: string }): Promise<TTokenValidationResponse> {
     try {
       this._loggerService.info('AuthController.validateToken', 'AuthController');
       if (!tokenData.token) {
@@ -127,7 +133,7 @@ export class AuthController {
    */
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
-  async forgotPassword(@Body() forgotPasswordData: ForgotPasswordDTO): Promise<PasswordResetResponse> {
+  async forgotPassword(@Body() forgotPasswordData: ForgotPasswordDTO): Promise<TPasswordResetResponse> {
     try {
       this._loggerService.info('AuthController.forgotPassword', 'AuthController');
       return await this._authService.forgotPassword(forgotPasswordData);
@@ -146,7 +152,7 @@ export class AuthController {
     @Body() resetPasswordData: ResetPasswordDTO,
     @Headers('user-agent') userAgent: string,
     @Ip() ipAddress: string,
-  ): Promise<PasswordResetResponse> {
+  ): Promise<TPasswordResetResponse> {
     try {
       this._loggerService.info('AuthController.resetPassword', 'AuthController');
       return await this._authService.resetPassword(resetPasswordData, userAgent, ipAddress);
@@ -162,7 +168,7 @@ export class AuthController {
    */
   @Post('verify-email')
   @HttpCode(HttpStatus.OK)
-  async verifyEmail(@Body() verifyEmailData: VerifyEmailDTO): Promise<EmailVerificationResponse> {
+  async verifyEmail(@Body() verifyEmailData: VerifyEmailDTO): Promise<TEmailVerificationResponse> {
     try {
       this._loggerService.info('AuthController.verifyEmail', 'AuthController');
       return await this._authService.verifyEmail(verifyEmailData);
@@ -183,7 +189,7 @@ export class AuthController {
     @Headers('authorization') authHeader: string,
     @Headers('user-agent') userAgent: string,
     @Ip() ipAddress: string,
-  ): Promise<PasswordResetResponse> {
+  ): Promise<TPasswordResetResponse> {
     try {
       this._loggerService.info('AuthController.changePassword', 'AuthController');
       
@@ -211,7 +217,7 @@ export class AuthController {
    */
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(@Body() logoutData: { refreshToken: string }): Promise<LogoutResponse> {
+  async logout(@Body() logoutData: { refreshToken: string }): Promise<TLogoutResponse> {
     try {
       this._loggerService.info('AuthController.logout', 'AuthController');
       
@@ -239,7 +245,7 @@ export class AuthController {
    * GET /auth/me
    */
   @Get('me')
-  async getCurrentUser(@Headers('authorization') authHeader: string): Promise<TokenValidationResponse> {
+  async getCurrentUser(@Headers('authorization') authHeader: string): Promise<TTokenValidationResponse> {
     try {
       this._loggerService.info('AuthController.getCurrentUser', 'AuthController');
       

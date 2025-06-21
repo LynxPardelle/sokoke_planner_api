@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 /* Types */
 import { TTask, TTaskParentType } from '@src/planner/types/task.type';
-import { TSearch } from '@src/shared/types/search.type';
+import { TSearch, TSearchQueryParams } from '@src/shared/types/search.type';
 /* DTOs */
 import { CreateTaskDTO } from '@src/planner/DTOs/createTask.dto';
 import { UpdateTaskDTO } from '@src/planner/DTOs/updateTask.dto';
@@ -19,7 +19,7 @@ import { UpdateTaskDTO } from '@src/planner/DTOs/updateTask.dto';
 import { TaskService } from '@src/planner/services/task.service';
 import { LoggerService } from '@src/shared/services/logger.service';
 /* Utils */
-import { transformQueryToSearch, SearchQueryParams } from '@src/shared/utils/search.util';
+import { transformQueryToSearch } from '@src/shared/utils/search.util';
 @Controller('task')
 export class TaskController {
   constructor(
@@ -63,7 +63,7 @@ export class TaskController {
    * filtering, and advanced options like date ranges and field selection.
    * 
    * @route GET /task
-   * @param {SearchQueryParams} query - Search and filter parameters
+   * @param {TSearchQueryParams} query - Search and filter parameters
    * @returns {Promise<TRepositoryResponse<TTask[]>>} Array of tasks with metadata
    * 
    * Available query parameters:
@@ -82,7 +82,7 @@ export class TaskController {
    * - dateField: Field for date range (default: createdAt)
    */
   @Get('')
-  async readAll(@Query() query: SearchQueryParams) {
+  async readAll(@Query() query: TSearchQueryParams) {
     this._loggerService.info('TaskController.readAll', 'TaskController');
     
     const allowedFilterFields = [

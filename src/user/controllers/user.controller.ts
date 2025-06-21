@@ -12,7 +12,7 @@ import {
 import { isValidObjectId } from 'mongoose';
 /* Types */
 import { TUser } from '@src/user/types/user.type';
-import { TSearch } from '@src/shared/types/search.type';
+import { TSearch, TSearchQueryParams } from '@src/shared/types/search.type';
 /* DTOs */
 import { CreateUserDTO } from '@src/user/DTOs/createUser.dto';
 import { UpdateUserDTO } from '@src/user/DTOs/updateUser.dto';
@@ -20,7 +20,7 @@ import { UpdateUserDTO } from '@src/user/DTOs/updateUser.dto';
 import { UserService } from '@src/user/services/user.service';
 import { LoggerService } from '@src/shared/services/logger.service';
 /* Utils */
-import { transformQueryToSearch, SearchQueryParams } from '@src/shared/utils/search.util';
+import { transformQueryToSearch } from '@src/shared/utils/search.util';
 
 @Controller('user')
 export class UserController {
@@ -57,7 +57,7 @@ export class UserController {
    * Get all users with advanced search and filtering options
    * 
    * @route GET /user
-   * @param {SearchQueryParams} query - Search and filter parameters
+   * @param {TSearchQueryParams} query - Search and filter parameters
    * @returns {Promise<TRepositoryResponse<TUser[]>>} Array of users with metadata
    * 
    * Available query parameters:
@@ -71,7 +71,7 @@ export class UserController {
    * - isVerified: Filter by verification status (true/false)
    */
   @Get('')
-  async readAll(@Query() query: SearchQueryParams) {
+  async readAll(@Query() query: TSearchQueryParams) {
     this._loggerService.info('UserController.readAll', 'UserController');
 
     const allowedFilterFields = [
